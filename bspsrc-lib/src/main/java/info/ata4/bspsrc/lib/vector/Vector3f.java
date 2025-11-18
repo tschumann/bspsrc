@@ -122,7 +122,7 @@ public final class Vector3f extends VectorXf<Vector3f> {
 
         // rotate y (yaw)
         if (angles.y() != 0) {
-            Point2d p = new Point2d(rx, rz).rotate(angles.y());
+            Point2d p = new Point2d(rx, rz).rotate(-angles.y());
             rx = p.x;
             rz = p.y;
         }
