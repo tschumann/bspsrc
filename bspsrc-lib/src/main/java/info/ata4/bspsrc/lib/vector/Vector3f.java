@@ -1,13 +1,3 @@
-/*
-** 2011 April 5
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-*/
-
 package info.ata4.bspsrc.lib.vector;
 
 import info.ata4.io.DataReader;
@@ -15,17 +5,18 @@ import info.ata4.io.DataWriter;
 
 import java.io.IOException;
 
-/**
- * An immutable fluent interface three-dimensional vector class for float values.
- * 
- * Original class name: unmap.Vec
- * Original author: Bob (Mellish?)
- * Original creation date: January 20, 2005, 7:41 PM
- *
- * @author Nico Bergemann <barracuda415 at yahoo.de>
- */
+/// An immutable three-dimensional vector class for float values.
+/// This class extends [VectorXf] for 3 components (x, y, z) and provides
+/// 3D-specific operations like cross product and rotation (pitch, yaw, roll).
+/// All modification methods return a new `Vector3f` instance.
 public final class Vector3f extends VectorXf<Vector3f> {
 
+    /// Reads three float values (x, y, z) from the provided [DataReader]
+    /// and constructs a new `Vector3f`.
+    ///
+    /// @param in The data reader to read from.
+    /// @return A new `Vector3f` instance.
+    /// @throws IOException If an I/O error occurs.
     public static Vector3f read(DataReader in) throws IOException {
         float x = in.readFloat();
         float y = in.readFloat();
@@ -33,6 +24,12 @@ public final class Vector3f extends VectorXf<Vector3f> {
         return new Vector3f(x, y, z);
     }
 
+    /// Writes the x, y, and z components of the given vector to the provided
+    /// [DataWriter].
+    ///
+    /// @param out The data writer to write to.
+    /// @param vec The vector to write.
+    /// @throws IOException If an I/O error occurs.
     public static void write(DataWriter out, Vector3f vec) throws IOException {
         out.writeFloat(vec.x());
         out.writeFloat(vec.y());
@@ -48,14 +45,12 @@ public final class Vector3f extends VectorXf<Vector3f> {
     public static final Vector3f BASE_VECTOR_X = new Vector3f(1, 0, 0);
     public static final Vector3f BASE_VECTOR_Y = new Vector3f(0, 1, 0);
     public static final Vector3f BASE_VECTOR_Z = new Vector3f(0, 0, 1);
-    
-    /**
-     * Constructs a new Vector3f from x, y and z components
-     *
-     * @param x the vector x component
-     * @param y the vector y component
-     * @param z the vector z component
-     */
+
+    /// Constructs a new Vector3f from x, y and z components.
+    ///
+    /// @param x the vector x component
+    /// @param y the vector y component
+    /// @param z the vector z component
     public Vector3f(float x, float y, float z) {
         super(new float[]{x, y, z});
     }
@@ -63,7 +58,12 @@ public final class Vector3f extends VectorXf<Vector3f> {
     private Vector3f(float[] storage) {
         super(storage);
     }
-    
+
+    /// Creates a new `Vector3f` from a float array.
+    ///
+    /// @param array The float array (must have a length of 3).
+    /// @return A new `Vector3f` instance.
+    /// @throws IllegalArgumentException if the array length is not 3.
     public static Vector3f from_array(float[] array) {
         verifySize(array, 3);
         return new Vector3f(array.clone());
@@ -74,21 +74,25 @@ public final class Vector3f extends VectorXf<Vector3f> {
         return new Vector3f(storage.clone());
     }
 
+    /// @return The X component of the vector.
     public float x() { return storage[0]; }
+    /// @return The Y component of the vector.
     public float y() { return storage[1]; }
+    /// @return The Z component of the vector.
     public float z() { return storage[2]; }
 
+    /// @param value The new float value for the X component.
+    /// @return A new vector with the X component set to the given value.
     public Vector3f withX(float value) { return with(0, value); }
+    /// @param value The new float value for the Y component.
+    /// @return A new vector with the Y component set to the given value.
     public Vector3f withY(float value) { return with(1, value); }
+    /// @param value The new float value for the Z component.
+    /// @return A new vector with the Z component set to the given value.
     public Vector3f withZ(float value) { return with(2, value); }
-
-
-    /**
-     * Vector cross product: this x that
-     * 
-     * @param that the vector to take a cross product
-     * @return the cross-product vector
-     */
+    
+    /// @param that the vector to take a cross product with.
+    /// @return A new vector instance representing the cross-product vector.
     public Vector3f cross(Vector3f that) {
         float rx = this.y() * that.z() - this.z() * that.y();
         float ry = this.z() * that.x() - this.x() * that.z();
@@ -97,12 +101,8 @@ public final class Vector3f extends VectorXf<Vector3f> {
         return new Vector3f(rx, ry, rz);
     }
 
-    /**
-     * Rotates the vector.
-     * 
-     * @param angles angles for each component in degrees
-     * @return rotated vector
-     */
+    /// @param angles A vector where x, y, z are the rotation angles in **degrees** for the respective axes.
+    /// @return A new, rotated vector instance.
     public Vector3f rotate(Vector3f angles) {
         if (angles.x() == 0 && angles.y() == 0 && angles.z() == 0) {
             // nothing to do here
@@ -137,6 +137,13 @@ public final class Vector3f extends VectorXf<Vector3f> {
         return new Vector3f((float)rx, (float)ry, (float)rz);
     }
 
+    /// Projects this 3D vector onto a 2D plane defined by an origin point and two
+    /// orthogonal axis vectors.
+    /// 
+    /// @param origin The origin point of the 2D plane.
+    /// @param axis1 The X-axis of the 2D plane (must be normalized and orthogonal to axis2).
+    /// @param axis2 The Y-axis of the 2D plane (must be normalized and orthogonal to axis1).
+    /// @return A new `Vector2f` representing the projected point on the plane.
     public Vector2f getAsPointOnPlane(Vector3f origin, Vector3f axis1, Vector3f axis2) {
         return new Vector2f(
                 axis1.dot(this.sub(origin)),
@@ -144,9 +151,7 @@ public final class Vector3f extends VectorXf<Vector3f> {
         );
     }
 
-    /**
-     * Private helper class for rotation
-     */
+    /// Private helper class for rotation.
     private static class Point2d {
 
         private final double x;
