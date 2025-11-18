@@ -403,8 +403,8 @@ public class BrushSource extends ModuleDecompile {
                 float[][] tvec = bsp.texinfos.get(brushSide.texinfo).textureVecsTexels;
                 writer.put("texturevecs_u", Arrays.toString(tvec[0]));
                 writer.put("texturevecs_v", Arrays.toString(tvec[1]));
-                Vector3f uaxis = new Vector3f(tvec[0]);
-                Vector3f vaxis = new Vector3f(tvec[1]);
+                Vector3f uaxis = new Vector3f(tvec[0][0], tvec[0][1], tvec[0][2]);
+                Vector3f vaxis = new Vector3f(tvec[1][0], tvec[1][1], tvec[1][2]);
                 Vector3f texNorm = uaxis.cross(vaxis);
                 double angle = Math.toDegrees(Math.acos(normal.dot(texNorm) / texNorm.length()));
                 writer.put("input_uv_normal", texNorm);

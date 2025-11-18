@@ -559,7 +559,7 @@ public class EntitySource extends ModuleDecompile {
                 .filter(dLeaf -> dLeaf.cluster >= 0)
                 .filter(dLeaf -> {
                     var size = dLeaf.maxs.sub(dLeaf.mins);
-                    return size.x > 0 && size.y > 0 && size.z > 0;
+                    return size.x() > 0 && size.y() > 0 && size.z() > 0;
                 })
                 .collect(Collectors.groupingBy(dLeaf -> dLeaf.cluster));
 
@@ -580,13 +580,13 @@ public class EntitySource extends ModuleDecompile {
             facesrc.writePolygon(
                     new Winding(List.of(
                             bounds.getMin(),
-                            bounds.getMin().set(0, bounds.getMax().x),
-                            bounds.getMin().set(0, bounds.getMax().x).set(1, bounds.getMax().y),
-                            bounds.getMin().set(1, bounds.getMax().y)
+                            bounds.getMin().withX(bounds.getMax().x()),
+                            bounds.getMin().withX(bounds.getMax().x()).withY(bounds.getMax().y()),
+                            bounds.getMin().withY(bounds.getMax().y())
                     )),
                     ToolTexture.TRIGGER,
                     true,
-                    bounds.getMax().z - bounds.getMin().z
+                    bounds.getMax().z() - bounds.getMin().z()
             );
 
             vmfmeta.writeMetaVisgroups(List.of(vmfmeta.visgroups()
@@ -605,13 +605,13 @@ public class EntitySource extends ModuleDecompile {
                     facesrc.writePolygon(
                             new Winding(List.of(
                                     leaf.mins,
-                                    leaf.mins.set(0, leaf.maxs.x),
-                                    leaf.mins.set(0, leaf.maxs.x).set(1, leaf.maxs.y),
-                                    leaf.mins.set(1, leaf.maxs.y)
+                                    leaf.mins.withX(leaf.maxs.x()),
+                                    leaf.mins.withX(leaf.maxs.x()).withY(leaf.maxs.y()),
+                                    leaf.mins.withY(leaf.maxs.y())
                             )),
                             ToolTexture.SKIP,
                             true,
-                            leaf.maxs.z - leaf.mins.z
+                            leaf.maxs.z() - leaf.mins.z()
                     );
 
                     vmfmeta.writeMetaVisgroups(List.of(vmfmeta.visgroups()
@@ -650,9 +650,9 @@ public class EntitySource extends ModuleDecompile {
             }
 
             // calculate u/v bases
-            Vector3f ubasis = new Vector3f(o.uvpoints[0].z, o.uvpoints[1].z, o.uvpoints[2].z);
+            Vector3f ubasis = new Vector3f(o.uvpoints[0].z(), o.uvpoints[1].z(), o.uvpoints[2].z());
 
-            boolean vflip = o.uvpoints[3].z == 1;
+            boolean vflip = o.uvpoints[3].z() == 1;
 
             Vector3f vbasis = o.basisNormal.cross(ubasis).normalize();
 
@@ -692,7 +692,7 @@ public class EntitySource extends ModuleDecompile {
             }
 
             for (int j = 0; j < 4; j++) {
-                writer.put("uv" + j, o.uvpoints[j].set(2, 0));
+                writer.put("uv" + j, o.uvpoints[j].withZ(0));
             }
 
             writer.put("RenderOrder", o.getRenderOrder());

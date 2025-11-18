@@ -164,7 +164,7 @@ public class Entity {
     }
 
     public void setVector3f(String key, Vector3f value) {
-        setValue(key, value.x + " " + value.y + " " + value.z);
+        setValue(key, value.x() + " " + value.y() + " " + value.z());
     }
 
     public Vector3f getOrigin() {
@@ -183,11 +183,11 @@ public class Entity {
         }
 
         // swap pitch yaw roll (Y Z X) axes
-        return new Vector3f(a.z, -a.x, a.y);
+        return new Vector3f(a.z(), -a.x(), a.y());
     }
 
     public void setAngles(Vector3f a) {
-        setVector3f("angles", new Vector3f(a.z, -a.x, a.y));
+        setVector3f("angles", new Vector3f(a.z(), -a.x(), a.y()));
     }
 
     /**

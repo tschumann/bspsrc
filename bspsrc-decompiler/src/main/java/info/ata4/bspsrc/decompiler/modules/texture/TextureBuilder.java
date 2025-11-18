@@ -211,8 +211,8 @@ public class TextureBuilder {
     private void buildLightmapScale() {
         // extract lightmap vectors
         float[][] lvec = texinfo.lightmapVecsLuxels;
-        Vector3f uaxis = new Vector3f(lvec[0]);
-        Vector3f vaxis = new Vector3f(lvec[1]);
+        Vector3f uaxis = new Vector3f(lvec[0][0], lvec[0][1], lvec[0][2]);
+        Vector3f vaxis = new Vector3f(lvec[1][0], lvec[1][1], lvec[1][2]);
 
         float ls = (uaxis.length() + vaxis.length()) / 2.0f;
 
@@ -224,8 +224,8 @@ public class TextureBuilder {
     private void buildUV() {        
         // extract texture vectors
         float[][] tvec = texinfo.textureVecsTexels;
-        Vector3f uaxis = new Vector3f(tvec[0]);
-        Vector3f vaxis = new Vector3f(tvec[1]);
+        Vector3f uaxis = new Vector3f(tvec[0][0], tvec[0][1], tvec[0][2]);
+        Vector3f vaxis = new Vector3f(tvec[1][0], tvec[1][1], tvec[1][2]);
 
         float utw = 1.0f / uaxis.length();
         float vtw = 1.0f / vaxis.length();

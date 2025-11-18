@@ -638,11 +638,11 @@ public class FaceSource extends ModuleDecompile {
             }
 
             // normals
-            normalSb.append(dv.vector.x);
+            normalSb.append(dv.vector.x());
             normalSb.append(" ");
-            normalSb.append(dv.vector.y);
+            normalSb.append(dv.vector.y());
             normalSb.append(" ");
-            normalSb.append(dv.vector.z);
+            normalSb.append(dv.vector.z());
 
             // distance
             distanceSb.append(dv.dist);
@@ -652,29 +652,29 @@ public class FaceSource extends ModuleDecompile {
 
             if (hasMultiBlend) {
                 // multiblend
-                multiblendSb.append(dmb.multiblend.x);
+                multiblendSb.append(dmb.multiblend.x());
                 multiblendSb.append(" ");
-                multiblendSb.append(dmb.multiblend.y);
+                multiblendSb.append(dmb.multiblend.y());
                 multiblendSb.append(" ");
-                multiblendSb.append(dmb.multiblend.z);
+                multiblendSb.append(dmb.multiblend.z());
                 multiblendSb.append(" ");
-                multiblendSb.append(dmb.multiblend.w);
+                multiblendSb.append(dmb.multiblend.w());
 
-                alphablendSb.append(dmb.alphablend.x);
+                alphablendSb.append(dmb.alphablend.x());
                 alphablendSb.append(" ");
-                alphablendSb.append(dmb.alphablend.y);
+                alphablendSb.append(dmb.alphablend.y());
                 alphablendSb.append(" ");
-                alphablendSb.append(dmb.alphablend.z);
+                alphablendSb.append(dmb.alphablend.z());
                 alphablendSb.append(" ");
-                alphablendSb.append(dmb.alphablend.w);
+                alphablendSb.append(dmb.alphablend.w());
 
                 for (int j = 0; j < dmb.multiblendcolors.length; j++) {
                     StringBuilder mbcsb = multiblendColorSbs.get(j);
-                    mbcsb.append(dmb.multiblendcolors[j].x);
+                    mbcsb.append(dmb.multiblendcolors[j].x());
                     mbcsb.append(" ");
-                    mbcsb.append(dmb.multiblendcolors[j].y);
+                    mbcsb.append(dmb.multiblendcolors[j].y());
                     mbcsb.append(" ");
-                    mbcsb.append(dmb.multiblendcolors[j].z);
+                    mbcsb.append(dmb.multiblendcolors[j].z());
                 }
             }
 

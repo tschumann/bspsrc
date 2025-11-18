@@ -47,12 +47,12 @@ public class DLeafVin extends DLeaf {
         out.writeInt(contents);
         out.writeInt(cluster);
         out.writeInt(areaFlags);
-        out.writeInt((int)mins.x);
-        out.writeInt((int)mins.y);
-        out.writeInt((int)mins.z);
-        out.writeInt((int)maxs.x);
-        out.writeInt((int)maxs.y);
-        out.writeInt((int)maxs.z);
+        out.writeInt((int)mins.x());
+        out.writeInt((int)mins.y());
+        out.writeInt((int)mins.z());
+        out.writeInt((int)maxs.x());
+        out.writeInt((int)maxs.y());
+        out.writeInt((int)maxs.z());
         out.writeInt(fstleafface);
         out.writeInt(numleafface);
         out.writeInt(fstleafbrush);

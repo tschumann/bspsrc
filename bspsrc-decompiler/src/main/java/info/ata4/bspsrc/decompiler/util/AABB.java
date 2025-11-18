@@ -41,9 +41,9 @@ public class AABB {
     }
 
     public boolean intersectsWith(AABB that) {
-        return that.max.x > this.min.x && that.min.x < this.max.x
-                && that.max.y > this.min.y && that.min.y < this.max.y
-                && that.max.z > this.min.z && that.min.z < this.max.z;
+        return that.max.x() > this.min.x() && that.min.x() < this.max.x()
+                && that.max.y() > this.min.y() && that.min.y() < this.max.y()
+                && that.max.z() > this.min.z() && that.min.z() < this.max.z();
     }
 
     public AABB include(AABB that) {

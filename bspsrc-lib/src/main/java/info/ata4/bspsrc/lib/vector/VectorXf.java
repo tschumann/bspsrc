@@ -9,58 +9,131 @@
  */
 package info.ata4.bspsrc.lib.vector;
 
+import info.ata4.bspsrc.common.util.IntToFloatFunction;
+
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Base class for immutable float vectors of a specific size.
  * 
  * @author Nico Bergemann <barracuda415 at yahoo.de>
  */
-public abstract class VectorXf implements Iterable<Float> {
+public sealed abstract class VectorXf<T extends VectorXf<T>>
+        implements Iterable<Float>
+        permits Vector2f, Vector3f, Vector4f {
+    protected final float[] storage;
 
-    public final int size;
-
-    public VectorXf(int SIZE) {
-        this.size = SIZE;
+    protected VectorXf(float[] storage) {
+        this.storage = requireNonNull(storage);
     }
 
-    public abstract float get(int index);
+    protected abstract T copy();
+    protected T copy(IntToFloatFunction function) {
+        var copy = copy();
+        for (int i = 0; i < storage.length; i++) {
+            copy.storage[i] = function.applyAsFloat(i);
+        }
+        return copy;
+    }
 
-    public abstract VectorXf set(int index, float value);
+
+    public float get(int index) {
+        return storage[index];
+    }
+
+    public T with(int index, float value) {
+        var copy = copy();
+        copy.storage[index] = value;
+        return copy;
+    }
+    
+    public int size() {
+        return storage.length;
+    }
+
+    public T add(float value) {
+        return copy(i -> this.storage[i] + value);
+    }
+    public T add(T other) {
+        return copy(i -> this.storage[i] + other.storage[i]);
+    }
+
+    public T sub(float value) {
+        return copy(i -> this.storage[i] - value);
+    }
+    public T sub(T other) {
+        return copy(i -> this.storage[i] - other.storage[i]);
+    }
+
+    public float dot(T other) {
+        var sum = 0f;
+        for (int i = 0; i < storage.length; i++) {
+            sum += this.storage[i] * other.storage[i];
+        }
+        return sum;
+    }
+
+    public T scalar(float value) {
+        return copy(i -> this.storage[i] * value);
+    }
+    public T scalar(T other) {
+        return copy(i -> this.storage[i] * other.storage[i]);
+    }
+
+    public T min(float value) {
+        return copy(i -> Math.min(this.storage[i], value));
+    }
+    public T min(T other) {
+        return copy(i -> Math.min(this.storage[i], other.storage[i]));
+    }
+
+    public T max(float value) {
+        return copy(i -> Math.max(this.storage[i], value));
+    }
+    public T max(T other) {
+        return copy(i -> Math.max(this.storage[i], other.storage[i]));
+    }
+
+    public T normalize() {
+        var length = length();
+        return copy(i -> this.storage[i] / length);
+    }
+
+    public float length() {
+        var sum = 0.0;
+        for (float v : storage) {
+            sum += v * v;
+        }
+        return (float) Math.sqrt(sum);
+    }
 
     /**
      * Checks if the vector has NaN values.
-     * 
+     *
      * @return true if one value is NaN
      */
     public boolean isNaN() {
-        for (float value : this) {
-            if (Float.isNaN(value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream().anyMatch(v -> v.isInfinite());
     }
 
     /**
      * Checks if the vector has infinite values.
-     * 
+     *
      * @return true if one value is infinite
      */
     public boolean isInfinite() {
-        for (float value : this) {
-            if (Float.isInfinite(value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return stream().anyMatch(v -> v.isInfinite());
     }
 
     /**
      * Checks if the vector has NaN or infinite values.
-     * 
+     *
      * @return true if one value is NaN or infinite
      */
     public boolean isValid() {
@@ -68,81 +141,48 @@ public abstract class VectorXf implements Iterable<Float> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof VectorXf)) {
-            return false;
-        }
-
-        VectorXf that = (VectorXf) obj;
-
-        if (this.size != that.size) {
-            return false;
-        }
-
-        for (int i = 0; i < size; i++) {
-            if (this.get(i) != that.get(i)) {
-                return false;
-            }
-        }
-
-        return true;
+    public final boolean equals(Object o) {
+        return o instanceof VectorXf<?> vectorXf
+                && Arrays.equals(storage, vectorXf.storage);
     }
 
     @Override
     public int hashCode() {
-        int hash = size;
-
-        for (float value : this) {
-            hash = size * size * hash + Float.floatToIntBits(value);
-        }
-
-        return hash;
+        return Arrays.hashCode(storage);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("(");
-
-        for (int i = 0; i < size; i++) {
-            sb.append(get(i));
-            if (i != size - 1) {
-                sb.append(", ");
-            }
-        }
-
-        sb.append(")");
-
-        return sb.toString();
+        return stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", ", "(", ")"));
     }
 
     @Override
     public Iterator<Float> iterator() {
-        return new ValueIterator();
+        return new Iterator<>() {
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < storage.length;
+            }
+
+            @Override
+            public Float next() {
+                return storage[index++];
+            }
+        };
     }
 
-    /**
-     * Private value iterator for the Iterable interface
-     */
-    private class ValueIterator implements Iterator<Float> {
-
-        private int index;
-
-        @Override
-        public boolean hasNext() {
-            return index < size;
+    public Stream<Float> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+    
+    protected static void verifySize(float[] elements, int size) {
+        if (elements.length != size) {
+            throw new IllegalArgumentException(
+                    String.format("Elements array size %d, doesn't match vector size %d", elements.length, size));
         }
-
-        @Override
-        public Float next() {
-            return get(index++);
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Can't remove immutable vector component");
-        }
-
     }
 }

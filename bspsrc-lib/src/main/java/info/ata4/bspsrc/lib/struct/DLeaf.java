@@ -62,12 +62,12 @@ public class DLeaf implements DStruct {
         out.writeInt(contents);
         out.writeShort((short)cluster);
         out.writeShort((short)areaFlags);
-        out.writeShort((short)mins.x);
-        out.writeShort((short)mins.y);
-        out.writeShort((short)mins.z);
-        out.writeShort((short)maxs.x);
-        out.writeShort((short)maxs.y);
-        out.writeShort((short)maxs.z);
+        out.writeShort((short)mins.x());
+        out.writeShort((short)mins.y());
+        out.writeShort((short)mins.z());
+        out.writeShort((short)maxs.x());
+        out.writeShort((short)maxs.y());
+        out.writeShort((short)maxs.z());
         out.writeUnsignedShort(fstleafface);
         out.writeUnsignedShort(numleafface);
         out.writeUnsignedShort(fstleafbrush);

@@ -214,7 +214,7 @@ public class WindingFactory {
         int idir = -1;
 
         // for each axis
-        for (int i = 0; i < pl.normal.size; i++) {
+        for (int i = 0; i < pl.normal.size(); i++) {
             float dc = Math.abs(pl.normal.get(i));
             // find the biggest component
             if (dc <= dmax) {
@@ -303,7 +303,7 @@ public class WindingFactory {
      * @param vector
      * @return {@code true}, if any component of the vector is greater than {@link #maxCoord}, {@code false} otherwise.
      */
-    public boolean isHuge(VectorXf vector) {
+    public boolean isHuge(VectorXf<?> vector) {
         for (float v : vector) {
             if (Math.abs(v) > maxCoord)
                 return true;

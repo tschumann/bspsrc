@@ -162,9 +162,9 @@ public class VmfWriter implements Closeable {
             L.warn("Invalid vector: {}", v);
             sb.append("0 0 0");
         } else {
-            sb.append(formatFloat(v.x)).append(' ');
-            sb.append(formatFloat(v.y)).append(' ');
-            sb.append(formatFloat(v.z));
+            sb.append(formatFloat(v.x())).append(' ');
+            sb.append(formatFloat(v.y())).append(' ');
+            sb.append(formatFloat(v.z()));
         }
 
         if (p == 1) {
@@ -184,9 +184,9 @@ public class VmfWriter implements Closeable {
             L.warn("Invalid vector: {}", tx.axis);
             sb.append("0 0 0 ");
         } else {
-            sb.append(formatFloat(tx.axis.x)).append(' ');
-            sb.append(formatFloat(tx.axis.y)).append(' ');
-            sb.append(formatFloat(tx.axis.z)).append(' ');
+            sb.append(formatFloat(tx.axis.x())).append(' ');
+            sb.append(formatFloat(tx.axis.y())).append(' ');
+            sb.append(formatFloat(tx.axis.z())).append(' ');
         }
 
         sb.append(formatFloat(tx.shift));

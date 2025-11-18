@@ -45,12 +45,12 @@ public class DNodeVin extends DNode {
         out.writeInt(planenum);
         out.writeInt(children[0]);
         out.writeInt(children[1]);
-        out.writeInt((int)mins.x);
-        out.writeInt((int)mins.y);
-        out.writeInt((int)mins.z);
-        out.writeInt((int)maxs.x);
-        out.writeInt((int)maxs.y);
-        out.writeInt((int)maxs.z);
+        out.writeInt((int)mins.x());
+        out.writeInt((int)mins.y());
+        out.writeInt((int)mins.z());
+        out.writeInt((int)maxs.x());
+        out.writeInt((int)maxs.y());
+        out.writeInt((int)maxs.z());
         out.writeInt(fstface);
         out.writeInt(numface);
         out.writeInt(0); // padding

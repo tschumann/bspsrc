@@ -173,15 +173,15 @@ public class Winding implements List<Vector3f> {
             // vector of the split vertex
             Vector3f mv = Vector3f.NULL;
 
-            for (int j = 0; j < normal.size; j++) {
+            for (int j = 0; j < normal.size(); j++) {
                 // avoid round off error when possible
                 if (normal.get(j) == 1) {
-                    mv = mv.set(j, dist);
+                    mv = mv.with(j, dist);
                 } else if (normal.get(j) == -1) {
-                    mv = mv.set(j, -dist);
+                    mv = mv.with(j, -dist);
                 } else {
                     // check it! MSH
-                    mv = mv.set(j, p1.get(j) + dot * (p2.get(j) - p1.get(j)));
+                    mv = mv.with(j, p1.get(j) + dot * (p2.get(j) - p1.get(j)));
                 }
             }
 

@@ -148,7 +148,10 @@ public class ConvexPolygon extends AbstractList<Vector2f> {
                 .orElse(Vector2f.NULL);
 
         return new ConvexPolygon(vertices.stream()
-                .sorted(Comparator.comparingDouble(vertex -> Math.atan2(vertex.x - midPoint.x, vertex.y - midPoint.y)))
+                .sorted(Comparator.comparingDouble(vertex -> Math.atan2(
+                        vertex.x() - midPoint.x(),
+                        vertex.y() - midPoint.y()
+                )))
                 .toArray(Vector2f[]::new));
     }
 

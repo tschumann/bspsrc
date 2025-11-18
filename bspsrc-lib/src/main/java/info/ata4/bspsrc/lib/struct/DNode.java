@@ -54,12 +54,12 @@ public class DNode implements DStruct {
         out.writeInt(planenum);
         out.writeInt(children[0]);
         out.writeInt(children[1]);
-        out.writeShort((short)mins.x);
-        out.writeShort((short)mins.y);
-        out.writeShort((short)mins.z);
-        out.writeShort((short)maxs.x);
-        out.writeShort((short)maxs.y);
-        out.writeShort((short)maxs.z);
+        out.writeShort((short)mins.x());
+        out.writeShort((short)mins.y());
+        out.writeShort((short)mins.z());
+        out.writeShort((short)maxs.x());
+        out.writeShort((short)maxs.y());
+        out.writeShort((short)maxs.z());
         out.writeUnsignedShort(fstface);
         out.writeUnsignedShort(numface);
         out.writeShort(area);
