@@ -13,6 +13,7 @@ import info.ata4.bspsrc.common.util.IntToFloatFunction;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -60,6 +61,7 @@ public sealed abstract class VectorXf<T extends VectorXf<T>>
     /// @return The float value of the component.
     /// @throws ArrayIndexOutOfBoundsException if the index is out of range.
     public float get(int index) {
+        verifyInRange(index);
         return storage[index];
     }
 
@@ -71,6 +73,7 @@ public sealed abstract class VectorXf<T extends VectorXf<T>>
     /// @return A new vector instance with the modified component.
     /// @throws ArrayIndexOutOfBoundsException if the index is out of range.
     public T with(int index, float value) {
+        verifyInRange(index);
         var copy = copy();
         copy.storage[index] = value;
         return copy;
@@ -171,7 +174,7 @@ public sealed abstract class VectorXf<T extends VectorXf<T>>
 
     /// @return true if one or more components are NaN.
     public boolean isNaN() {
-        return stream().anyMatch(v -> v.isInfinite());
+        return stream().anyMatch(v -> v.isNaN());
     }
 
     /// @return true if one or more components are infinite.
@@ -223,7 +226,10 @@ public sealed abstract class VectorXf<T extends VectorXf<T>>
 
             @Override
             public Float next() {
-                return storage[index++];
+                if (index < storage.length)
+                    return storage[index++];
+                else
+                    throw new NoSuchElementException();
             }
         };
     }
@@ -232,7 +238,12 @@ public sealed abstract class VectorXf<T extends VectorXf<T>>
     public Stream<Float> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
-
+    
+    protected void verifyInRange(int index) {
+        if (index < 0 || index >= storage.length)
+            throw new IllegalArgumentException("Index %d is out of bounds for length %d".formatted(index, storage.length));
+    }
+    
     /// Verifies that the length of the given array matches the expected size
     /// of the vector.
     ///
