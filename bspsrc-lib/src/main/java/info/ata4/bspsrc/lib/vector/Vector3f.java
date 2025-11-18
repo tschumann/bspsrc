@@ -144,7 +144,7 @@ public final class Vector3f extends VectorXf<Vector3f> {
     /// @param axis1 The X-axis of the 2D plane (must be normalized and orthogonal to axis2).
     /// @param axis2 The Y-axis of the 2D plane (must be normalized and orthogonal to axis1).
     /// @return A new `Vector2f` representing the projected point on the plane.
-    public Vector2f getAsPointOnPlane(Vector3f origin, Vector3f axis1, Vector3f axis2) {
+    public Vector2f projectOnPlane(Vector3f origin, Vector3f axis1, Vector3f axis2) {
         return new Vector2f(
                 axis1.dot(this.sub(origin)),
                 axis2.dot(this.sub(origin))

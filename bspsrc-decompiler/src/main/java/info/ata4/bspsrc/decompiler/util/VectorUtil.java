@@ -71,11 +71,11 @@ public class VectorUtil {
         //Map 3d coordinates of windings to 2d (2d coordinates on the plane they lie on)
         // TODO: This can create colinear/degenerated vertices
         ConvexPolygon w1Polygon = w1.stream()
-                .map(vertex -> vertex.getAsPointOnPlane(origin, axis1, axis2))
+                .map(vertex -> vertex.projectOnPlane(origin, axis1, axis2))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), ConvexPolygon::new));
 
         ConvexPolygon w2Polygon = w2.stream()
-                .map(vertex -> vertex.getAsPointOnPlane(origin, axis1, axis2))
+                .map(vertex -> vertex.projectOnPlane(origin, axis1, axis2))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), ConvexPolygon::new));
 
         Optional<ConvexPolygon> intersectionPolygon = w1Polygon.getIntersectionPolygon(w2Polygon);
