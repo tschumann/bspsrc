@@ -7,7 +7,6 @@ import info.ata4.bspsrc.lib.BspFileReader;
 import info.ata4.bspsrc.lib.struct.DBrush;
 import info.ata4.bspsrc.lib.struct.DBrushSide;
 import info.ata4.bspsrc.lib.struct.DFace;
-import info.ata4.bspsrc.lib.vector.Vector3f;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -147,7 +146,7 @@ public class BrushSideFaceMapper extends ModuleRead {
 
 				DBrushSide brushSide = bsp.brushSides.get(brushSideIndex);
 				Winding brushSideWinding = windingFactory.fromSide(bsp, brush, brushSide);
-				Vector3f normal = bsp.planes.get(brushSide.pnum).normal;
+				var normal = bsp.planes.get(brushSide.pnum).normal.toDouble();
 
 				Set<Integer> potentialFaces = faceIndex.getOrDefault(
 						FaceIndexKey.fromBrushSide(brushSide),

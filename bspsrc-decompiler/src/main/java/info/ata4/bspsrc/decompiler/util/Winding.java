@@ -11,7 +11,7 @@
 package info.ata4.bspsrc.decompiler.util;
 
 import info.ata4.bspsrc.lib.struct.DPlane;
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 
 import java.util.*;
 
@@ -26,31 +26,31 @@ import java.util.*;
  * @author Nico Bergemann <barracuda415 at yahoo.de>
  */
 
-public class Winding implements List<Vector3f> {
+public class Winding implements List<Vector3d> {
 
-    private static final Winding EMPTY = new Winding(Collections.unmodifiableList(new ArrayList<Vector3f>()));
+    private static final Winding EMPTY = new Winding(Collections.unmodifiableList(new ArrayList<Vector3d>()));
 
     public static final int SIDE_FRONT = 0;
     public static final int SIDE_BACK = 1;
     public static final int SIDE_ON = 2;
 
     // epsilon values
-    public static final float EPS_SPLIT = 0.01f;
-    public static final float EPS_COMP = 0.5f;
-    public static final float EPS_DEGEN = 0.1f;
+    public static final double EPS_SPLIT = 0.01f;
+    public static final double EPS_COMP = 0.5f;
+    public static final double EPS_DEGEN = 0.1f;
 
     // list of vectors to vertex points
-    private final List<Vector3f> verts;
+    private final List<Vector3d> verts;
 
     public Winding(Winding that) {
         this.verts = that.verts;
     }
 
-    public Winding(List<Vector3f> verts) {
+    public Winding(List<Vector3d> verts) {
         this.verts = Collections.unmodifiableList(verts);
     }
 
-    public Winding(Vector3f[] vertices) {
+    public Winding(Vector3d[] vertices) {
         this.verts = Collections.unmodifiableList(Arrays.asList(vertices));
     }
 
@@ -65,17 +65,17 @@ public class Winding implements List<Vector3f> {
      * @param eps clipping epsilon
      * @param back keep vertices behind the plane?
      */
-    public Winding clipEpsilon(Vector3f normal, float dist, float eps, boolean back) {        
+    public Winding clipEpsilon(Vector3d normal, double dist, double eps, boolean back) {        
         // counts number of front, back and on vertices
         int[] counts = new int[] {0, 0, 0};
         final int size = verts.size();
-        float[] dists = new float[size + 1];
+        double[] dists = new double[size + 1];
         int[] sides = new int[size + 1];
 
         // determine sides for each point
         for (int i = 0; i < size; i++) {
             // distance along norm-dirn from origin to vertex
-            float dot = verts.get(i).dot(normal);
+            double dot = verts.get(i).dot(normal);
 
             // distance along norm-dirn from clip plane to vertex
             dot -= dist;
@@ -120,11 +120,11 @@ public class Winding implements List<Vector3f> {
             }
         }
 
-        List<Vector3f> vertsNew = new ArrayList<Vector3f>();
+        var vertsNew = new ArrayList<Vector3d>();
 
         for (int i = 0; i < size; i++) {
             // get i'th vertex
-            Vector3f p1 = verts.get(i);
+            Vector3d p1 = verts.get(i);
 
             if (sides[i] == SIDE_ON) {
                 vertsNew.add(p1);
@@ -155,7 +155,7 @@ public class Winding implements List<Vector3f> {
             // so generate a split point
 
             // will contain the next vertex position
-            Vector3f p2;
+            Vector3d p2;
 
             if (i == size - 1) {
                 // we're the last vertex in the winding
@@ -168,10 +168,10 @@ public class Winding implements List<Vector3f> {
 
             // dot is fractional position of clip plane between
             // this vertex and the next
-            float dot = dists[i] / (dists[i] - dists[i + 1]);
+            double dot = dists[i] / (dists[i] - dists[i + 1]);
 
             // vector of the split vertex
-            Vector3f mv = Vector3f.NULL;
+            Vector3d mv = Vector3d.NULL;
 
             for (int j = 0; j < normal.size(); j++) {
                 // avoid round off error when possible
@@ -200,7 +200,7 @@ public class Winding implements List<Vector3f> {
      * @param back keep vertices behind the plane?
      */
     public Winding clipPlane(DPlane pl, boolean back) {
-        return clipEpsilon(pl.normal, pl.dist, EPS_SPLIT, back);
+        return clipEpsilon(pl.normal.toDouble(), pl.dist, EPS_SPLIT, back);
     }
 
     /**
@@ -215,15 +215,15 @@ public class Winding implements List<Vector3f> {
      * @param projNormal a normalized vector specifying the projection direction
      * @return the clipped winding
      */
-    public Winding clipWinding(Winding other, Vector3f projNormal) {
+    public Winding clipWinding(Winding other, Vector3d projNormal) {
         if (other.size() < 3)
             return this;
 
         Winding result = this;
         for (int i = 0; i < other.size(); i++) {
-            Vector3f edge = other.get(i).sub(other.get((i + 1) % other.size()));
-            Vector3f normal = edge.cross(projNormal).normalize();
-            float dist = normal.dot(other.get(i));
+            Vector3d edge = other.get(i).sub(other.get((i + 1) % other.size()));
+            Vector3d normal = edge.cross(projNormal).normalize();
+            double dist = normal.dot(other.get(i));
 
             result = result.clipEpsilon(normal, dist, EPS_SPLIT, true);
         }
@@ -239,14 +239,14 @@ public class Winding implements List<Vector3f> {
             return this;
         }
 
-        ArrayList<Vector3f> vertsNew = new ArrayList<>();
+        ArrayList<Vector3d> vertsNew = new ArrayList<>();
 
         final int size = verts.size();
 
         for (int i = 0; i < size; i++) {
             int j = (i + 1) % size;
-            Vector3f v1 = verts.get(i);
-            Vector3f v2 = verts.get(j);
+            Vector3d v1 = verts.get(i);
+            Vector3d v2 = verts.get(j);
 
             if (v1.sub(v2).length() > EPS_DEGEN) {
                 vertsNew.add(v1);
@@ -264,15 +264,15 @@ public class Winding implements List<Vector3f> {
             return this;
         }
 
-        ArrayList<Vector3f> vertsNew = new ArrayList<>();
+        ArrayList<Vector3d> vertsNew = new ArrayList<>();
 
         final int size = verts.size();
 
         for (int i = 0; i < size; i++) {
             int j = (i + 1) % size;
             int k = (i + size - 1) % size;
-            Vector3f v1 = verts.get(j).sub(verts.get(i)).normalize();
-            Vector3f v2 = verts.get(i).sub(verts.get(k)).normalize();
+            Vector3d v1 = verts.get(j).sub(verts.get(i)).normalize();
+            Vector3d v2 = verts.get(i).sub(verts.get(k)).normalize();
 
             if (v1.dot(v2) < 0.999) {
                 vertsNew.add(verts.get(i));
@@ -287,28 +287,28 @@ public class Winding implements List<Vector3f> {
      * 
      * @param angles rotation angles
      */
-    public Winding rotate(Vector3f angles) {
+    public Winding rotate(Vector3d angles) {
         if (verts.isEmpty()) {
             return this;
         }
 
-        ArrayList<Vector3f> vertsNew = new ArrayList<>();
+        ArrayList<Vector3d> vertsNew = new ArrayList<>();
 
-        for (Vector3f vert : verts) {
+        for (Vector3d vert : verts) {
             vertsNew.add(vert.rotate(angles));
         }
 
         return new Winding(vertsNew);
     }
 
-    public Winding translate(Vector3f offset) {
+    public Winding translate(Vector3d offset) {
         if (verts.isEmpty()) {
             return this;
         }
 
-        ArrayList<Vector3f> vertsNew = new ArrayList<>();
+        ArrayList<Vector3d> vertsNew = new ArrayList<>();
 
-        for (Vector3f vert : verts) {
+        for (Vector3d vert : verts) {
             vertsNew.add(vert.add(offset));
         }
 
@@ -320,7 +320,7 @@ public class Winding implements List<Vector3f> {
             return this;
         }
 
-        List<Vector3f> vertsNew = new ArrayList<>();
+        List<Vector3d> vertsNew = new ArrayList<>();
 
         final int size = verts.size();
 
@@ -351,10 +351,10 @@ public class Winding implements List<Vector3f> {
         }
 
         // compare minimum distance to any vertex
-        for (Vector3f v1 : this.verts) {
-            float min = 1e6f;
+        for (Vector3d v1 : this.verts) {
+            double min = 1e6f;
 
-            for (Vector3f v2 : that.verts) {
+            for (Vector3d v2 : that.verts) {
                 min = Math.min(min, v1.sub(v2).length());
             }
 
@@ -374,17 +374,17 @@ public class Winding implements List<Vector3f> {
      * @param pt point to test
      * @return true if the point lies inside this winding
      */
-    public boolean isInside(Vector3f pt) {
+    public boolean isInside(Vector3d pt) {
         if (isEmpty() || size() < 2) {
             // "Is not possible!"
             return false;
         }
 
         // get the first normal to test
-        Vector3f toPt = pt.sub(get(0));
-        Vector3f edge = get(1).sub(get(0));
-        Vector3f testCross = edge.cross(toPt).normalize();
-        Vector3f cross;
+        Vector3d toPt = pt.sub(get(0));
+        Vector3d edge = get(1).sub(get(0));
+        Vector3d testCross = edge.cross(toPt).normalize();
+        Vector3d cross;
 
         int size = size();
 
@@ -402,10 +402,10 @@ public class Winding implements List<Vector3f> {
     }
 
     public AABB getBounds() {
-        Vector3f mins = Vector3f.MAX_VALUE;
-        Vector3f maxs = Vector3f.MIN_VALUE;
+        Vector3d mins = Vector3d.MAX_VALUE;
+        Vector3d maxs = Vector3d.MIN_VALUE;
 
-        for (Vector3f vert : verts) {
+        for (Vector3d vert : verts) {
             mins = mins.min(vert);
             maxs = maxs.max(vert);
         }
@@ -420,11 +420,11 @@ public class Winding implements List<Vector3f> {
      * 
      * @return 
      */
-    public Vector3f getCenter() {
-        Vector3f sum = Vector3f.NULL;
+    public Vector3d getCenter() {
+        Vector3d sum = Vector3d.NULL;
 
         // add all verts
-        for (Vector3f vert : verts) {
+        for (Vector3d vert : verts) {
             sum = sum.add(vert);
         }
 
@@ -435,11 +435,11 @@ public class Winding implements List<Vector3f> {
     /**
      * Returns the plane points of this winding in form of a triangle.
      * 
-     * @return Vector3f array with three points of the triangle
+     * @return Vector3d array with three points of the triangle
      */
-    public Vector3f[] buildPlane() {
-        Vector3f[] vertsNew = new Vector3f[verts.size()];
-        Vector3f[] plane = new Vector3f[3];
+    public Vector3d[] buildPlane() {
+        Vector3d[] vertsNew = new Vector3d[verts.size()];
+        Vector3d[] plane = new Vector3d[3];
 
         // 1st vert is always base vertex
         plane[0] = get(0);
@@ -451,7 +451,7 @@ public class Winding implements List<Vector3f> {
         }
 
         // the largest modulus of cross product found between ixj
-        float maxmcp = -1;
+        double maxmcp = -1;
         // the i index of largest cp
         int imax = -1;
         // the j index of largest cp
@@ -461,7 +461,7 @@ public class Winding implements List<Vector3f> {
         for (int i = 1; i < vertsNew.length; i++) {
             // ensures j>i
             for (int j = i + 1; j < vertsNew.length; j++) {
-                float mcp = vertsNew[i].cross(vertsNew[j]).length();
+                double mcp = vertsNew[i].cross(vertsNew[j]).length();
                 if (mcp > maxmcp) {
                     maxmcp = mcp;
                     imax = i;
@@ -491,8 +491,8 @@ public class Winding implements List<Vector3f> {
                     continue;
                 }
 
-                Vector3f v1 = verts.get(i);
-                Vector3f v2 = verts.get(j);
+                Vector3d v1 = verts.get(i);
+                Vector3d v2 = verts.get(j);
 
                 if (v1.equals(v2)) {
                     return true;
@@ -508,13 +508,13 @@ public class Winding implements List<Vector3f> {
      * 
      * @return total area
      */
-    public float getArea() {
-        float total = 0;
+    public double getArea() {
+        double total = 0;
         final int size = verts.size();
 
         for (int i = 2; i < size; i++) {
-            Vector3f v1 = verts.get(i - 1).sub(verts.get(0));
-            Vector3f v2 = verts.get(i).sub(verts.get(0));
+            Vector3d v1 = verts.get(i - 1).sub(verts.get(0));
+            Vector3d v2 = verts.get(i).sub(verts.get(0));
             total += v1.cross(v2).length();
         }
 
@@ -537,7 +537,7 @@ public class Winding implements List<Vector3f> {
     }
 
     @Override
-    public Iterator<Vector3f> iterator() {
+    public Iterator<Vector3d> iterator() {
         return verts.iterator();
     }
 
@@ -552,7 +552,7 @@ public class Winding implements List<Vector3f> {
     }
 
     @Override
-    public boolean add(Vector3f e) {
+    public boolean add(Vector3d e) {
         throw new UnsupportedOperationException();
     }
 
@@ -567,12 +567,12 @@ public class Winding implements List<Vector3f> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Vector3f> c) {
+    public boolean addAll(Collection<? extends Vector3d> c) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Vector3f> c) {
+    public boolean addAll(int index, Collection<? extends Vector3d> c) {
         throw new UnsupportedOperationException();
     }
 
@@ -592,22 +592,22 @@ public class Winding implements List<Vector3f> {
     }
 
     @Override
-    public Vector3f get(int index) {
+    public Vector3d get(int index) {
         return verts.get(index);
     }
 
     @Override
-    public Vector3f set(int index, Vector3f element) {
+    public Vector3d set(int index, Vector3d element) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void add(int index, Vector3f element) {
+    public void add(int index, Vector3d element) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Vector3f remove(int index) {
+    public Vector3d remove(int index) {
         throw new UnsupportedOperationException();
     }
 
@@ -622,17 +622,17 @@ public class Winding implements List<Vector3f> {
     }
 
     @Override
-    public ListIterator<Vector3f> listIterator() {
+    public ListIterator<Vector3d> listIterator() {
         return verts.listIterator();
     }
 
     @Override
-    public ListIterator<Vector3f> listIterator(int index) {
+    public ListIterator<Vector3d> listIterator(int index) {
         return verts.listIterator(index);
     }
 
     @Override
-    public List<Vector3f> subList(int fromIndex, int toIndex) {
+    public List<Vector3d> subList(int fromIndex, int toIndex) {
         return verts.subList(fromIndex, toIndex);
     }
 

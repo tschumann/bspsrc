@@ -9,7 +9,7 @@
  */
 package info.ata4.bspsrc.decompiler.modules.entity;
 
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 
 /**
  * Structure for a Hammer viewport camera.
@@ -18,10 +18,10 @@ import info.ata4.bspsrc.lib.vector.Vector3f;
  */
 public class Camera {
 
-    public final Vector3f pos;
-    public final Vector3f look;
+    public final Vector3d pos;
+    public final Vector3d look;
 
-    public Camera(Vector3f pos, Vector3f look) {
+    public Camera(Vector3d pos, Vector3d look) {
         this.pos = pos;
         this.look = look;
     }

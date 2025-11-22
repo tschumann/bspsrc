@@ -9,7 +9,7 @@
  */
 package info.ata4.bspsrc.decompiler.util;
 
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 
 /**
  * Class for axis-aligned bounding boxes.
@@ -18,25 +18,25 @@ import info.ata4.bspsrc.lib.vector.Vector3f;
  */
 public class AABB {
 
-    public static final AABB ZERO = new AABB(Vector3f.MAX_VALUE, Vector3f.MIN_VALUE);
+    public static final AABB ZERO = new AABB(Vector3d.MAX_VALUE, Vector3d.MIN_VALUE);
 
-    private final Vector3f min;
-    private final Vector3f max;
+    private final Vector3d min;
+    private final Vector3d max;
 
-    public AABB(Vector3f mins, Vector3f maxs) {
+    public AABB(Vector3d mins, Vector3d maxs) {
         this.min = mins;
         this.max = maxs;
     }
 
-    public Vector3f getMin() {
+    public Vector3d getMin() {
         return min;
     }
 
-    public Vector3f getMax() {
+    public Vector3d getMax() {
         return max;
     }
 
-    public Vector3f getSize() {
+    public Vector3d getSize() {
         return max.sub(min);
     }
 
@@ -53,7 +53,7 @@ public class AABB {
         );
     }
 
-    public AABB expand(Vector3f v) {
+    public AABB expand(Vector3d v) {
         return new AABB(
                 min.sub(v),
                 max.add(v)
@@ -61,7 +61,7 @@ public class AABB {
     }
 
     public AABB expand(float e) {
-        return expand(new Vector3f(e, e, e));
+        return expand(new Vector3d(e, e, e));
     }
 
     @Override

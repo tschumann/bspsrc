@@ -28,6 +28,7 @@ import info.ata4.bspsrc.lib.nmo.NmoAntiObjective;
 import info.ata4.bspsrc.lib.nmo.NmoFile;
 import info.ata4.bspsrc.lib.nmo.NmoObjective;
 import info.ata4.bspsrc.lib.struct.*;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import info.ata4.bspsrc.lib.vector.Vector3f;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -380,8 +381,8 @@ public class EntitySource extends ModuleDecompile {
             }
 
             // use origin for brush entities
-            Vector3f origin = ent.getOrigin();
-            Vector3f angles = fixEntityRot ? ent.getAngles() : null;
+            var origin = Vector3d.fromFloat(ent.getOrigin());
+            var angles = fixEntityRot ? Vector3d.fromFloat(ent.getAngles()) : null;
 
             // write model brushes
             if (modelNum > 0) {
@@ -570,7 +571,7 @@ public class EntitySource extends ModuleDecompile {
             int cluster = leaves.getFirst().cluster;
             
             var bounds = leaves.stream()
-                    .map(dLeaf -> new AABB(dLeaf.mins, dLeaf.maxs))
+                    .map(dLeaf -> new AABB(dLeaf.mins.toDouble(), dLeaf.maxs.toDouble()))
                     .reduce(AABB.ZERO, AABB::include);
 
             writer.start("entity");
@@ -604,10 +605,10 @@ public class EntitySource extends ModuleDecompile {
 
                     facesrc.writePolygon(
                             new Winding(List.of(
-                                    leaf.mins,
-                                    leaf.mins.withX(leaf.maxs.x()),
-                                    leaf.mins.withX(leaf.maxs.x()).withY(leaf.maxs.y()),
-                                    leaf.mins.withY(leaf.maxs.y())
+                                    leaf.mins.toDouble(),
+                                    leaf.mins.withX(leaf.maxs.x()).toDouble(),
+                                    leaf.mins.withX(leaf.maxs.x()).withY(leaf.maxs.y()).toDouble(),
+                                    leaf.mins.withY(leaf.maxs.y()).toDouble()
                             )),
                             ToolTexture.SKIP,
                             true,
@@ -1073,25 +1074,22 @@ public class EntitySource extends ModuleDecompile {
     }
 
     private void createCamera(Entity ent) {
-        Vector3f origin = ent.getOrigin();
-        Vector3f angles = ent.getAngles();
+        var origin = Vector3d.fromFloat(ent.getOrigin());
+        var angles = Vector3d.fromFloat(ent.getAngles());
 
         if (origin == null) {
             return;
         }
 
         if (angles == null) {
-            angles = Vector3f.NULL;
+            angles = Vector3d.NULL;
         }
 
-        // calculate position and look vectors
-        Vector3f pos, look;
-
         // move 64 units up
-        pos = origin.add(new Vector3f(0, 0, 64));
+        var pos = origin.add(new Vector3d(0, 0, 64));
 
         // look 256 units forwards to entity facing direction
-        look = new Vector3f(192, 0, 0).rotate(angles).add(origin);
+        var look = new Vector3d(192, 0, 0).rotate(angles).add(origin);
 
         // move 64 units backwards to facing direction
         pos = look.sub(pos).normalize().scalar(-64).add(pos);

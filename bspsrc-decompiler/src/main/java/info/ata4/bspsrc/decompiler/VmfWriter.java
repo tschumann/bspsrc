@@ -14,6 +14,7 @@ import info.ata4.bspsrc.decompiler.modules.texture.Texture;
 import info.ata4.bspsrc.decompiler.modules.texture.TextureAxis;
 import info.ata4.bspsrc.lib.entity.Entity;
 import info.ata4.bspsrc.lib.entity.KeyValue;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import info.ata4.bspsrc.lib.vector.Vector3f;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,7 +74,7 @@ public class VmfWriter implements Closeable {
         pw.print("}\r\n");
     }
 
-    public void put(String key, Object value) {
+    public void put(String key, String value) {
         indent();
         pw.printf("\"%s\" \"%s\"\r\n", key, value);
     }
@@ -103,21 +104,29 @@ public class VmfWriter implements Closeable {
     }
 
     public void put(String key, Vector3f v, int p) {
-        put(key, formatVector3f(v, p));
+        put(key, formatVector3d(v.toDouble(), p));
+    }
+
+    public void put(String key, Vector3d v, int p) {
+        put(key, formatVector3d(v, p));
     }
 
     public void put(String key, Vector3f v) {
-        put(key, formatVector3f(v, 0));
+        put(key, v, 0);
     }
 
-    public void put(String key, Vector3f v1, Vector3f v2, Vector3f v3) {
+    public void put(String key, Vector3d v) {
+        put(key, v, 0);
+    }
+
+    public void put(String key, Vector3d v1, Vector3d v2, Vector3d v3) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(formatVector3f(v1, 1));
+        sb.append(formatVector3d(v1, 1));
         sb.append(' ');
-        sb.append(formatVector3f(v2, 1));
+        sb.append(formatVector3d(v2, 1));
         sb.append(' ');
-        sb.append(formatVector3f(v3, 1));
+        sb.append(formatVector3d(v3, 1));
 
         put(key, sb.toString());
     }
@@ -149,7 +158,7 @@ public class VmfWriter implements Closeable {
         put(keyValue.getKey(), keyValue.getValue());
     }
 
-    private String formatVector3f(Vector3f v, int p) {
+    private String formatVector3d(Vector3d v, int p) {
         StringBuilder sb = new StringBuilder();
 
         if (p == 1) {

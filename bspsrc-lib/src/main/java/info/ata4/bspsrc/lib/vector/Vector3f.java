@@ -94,9 +94,9 @@ public final class Vector3f extends VectorXf<Vector3f> {
     /// @param that the vector to take a cross product with.
     /// @return A new vector instance representing the cross-product vector.
     public Vector3f cross(Vector3f that) {
-        float rx = this.y() * that.z() - this.z() * that.y();
-        float ry = this.z() * that.x() - this.x() * that.z();
-        float rz = this.x() * that.y() - this.y() * that.x();
+        var rx = this.y() * that.z() - this.z() * that.y();
+        var ry = this.z() * that.x() - this.x() * that.z();
+        var rz = this.x() * that.y() - this.y() * that.x();
 
         return new Vector3f(rx, ry, rz);
     }
@@ -149,6 +149,10 @@ public final class Vector3f extends VectorXf<Vector3f> {
                 axis1.dot(this.sub(origin)),
                 axis2.dot(this.sub(origin))
         );
+    }
+    
+    public Vector3d toDouble() {
+        return new Vector3d(x(), y(), z());
     }
 
     /// Private helper class for rotation.

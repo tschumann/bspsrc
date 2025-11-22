@@ -27,7 +27,7 @@ import info.ata4.bspsrc.lib.BspFileReader;
 import info.ata4.bspsrc.lib.struct.DBrush;
 import info.ata4.bspsrc.lib.struct.DBrushSide;
 import info.ata4.bspsrc.lib.struct.DModel;
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -199,7 +199,7 @@ public class BrushSource extends ModuleDecompile {
         }
     }
 
-    public boolean writeBrush(int ibrush, Vector3f origin, Vector3f angles) {
+    public boolean writeBrush(int ibrush, Vector3d origin, Vector3d angles) {
         DBrush brush = bsp.brushes.get(ibrush);
 
         int brushID = vmfmeta.getUID();
@@ -237,11 +237,11 @@ public class BrushSource extends ModuleDecompile {
                     throw new BrushSideException("too big");
                 }
 
-                Vector3f[] plane = wind.buildPlane();
+                var plane = wind.buildPlane();
 
-                Vector3f e1 = plane[0];
-                Vector3f e2 = plane[1];
-                Vector3f e3 = plane[2];
+                var e1 = plane[0];
+                var e2 = plane[1];
+                var e3 = plane[2];
 
                 if (!e1.isValid() || !e2.isValid() || !e3.isValid()) {
                     throw new BrushSideException("invalid plane");
@@ -255,8 +255,8 @@ public class BrushSource extends ModuleDecompile {
                             continue;
                         }
 
-                        Vector3f v1 = plane[p1];
-                        Vector3f v2 = plane[p2];
+                        var v1 = plane[p1];
+                        var v2 = plane[p2];
 
                         if (v1.equals(v2)) {
                             throw new BrushSideException("duplicate plane point " + v1);
@@ -330,22 +330,22 @@ public class BrushSource extends ModuleDecompile {
         return writeBrush(ibrush, null, null);
     }
 
-    private boolean writeSide(int ibrushside, int ibrush, Winding wind, Vector3f origin, Vector3f angles) {
+    private boolean writeSide(int ibrushside, int ibrush, Winding wind, Vector3d origin, Vector3d angles) {
         DBrushSide brushSide = bsp.brushSides.get(ibrushside);
 
         // calculate plane vectors
-        Vector3f[] plane = wind.buildPlane();
+        var plane = wind.buildPlane();
 
-        Vector3f e1 = plane[0];
-        Vector3f e2 = plane[1];
-        Vector3f e3 = plane[2];
+        var e1 = plane[0];
+        var e2 = plane[1];
+        var e3 = plane[2];
 
         // calculate plane normal
         // NOTE: the plane normal from the BSP could be invalid if the brush was
         //       rotated! better re-calculate it every time.
-        Vector3f ev12 = e2.sub(e1);
-        Vector3f ev13 = e3.sub(e1);
-        Vector3f normal = ev12.cross(ev13).normalize();
+        var ev12 = e2.sub(e1);
+        var ev13 = e3.sub(e1);
+        var normal = ev12.cross(ev13).normalize();
 
         // build texture
         var tb = new TextureBuilder(bsp, texsrc, occReallocationData);
@@ -403,9 +403,9 @@ public class BrushSource extends ModuleDecompile {
                 float[][] tvec = bsp.texinfos.get(brushSide.texinfo).textureVecsTexels;
                 writer.put("texturevecs_u", Arrays.toString(tvec[0]));
                 writer.put("texturevecs_v", Arrays.toString(tvec[1]));
-                Vector3f uaxis = new Vector3f(tvec[0][0], tvec[0][1], tvec[0][2]);
-                Vector3f vaxis = new Vector3f(tvec[1][0], tvec[1][1], tvec[1][2]);
-                Vector3f texNorm = uaxis.cross(vaxis);
+                var uaxis = new Vector3d(tvec[0][0], tvec[0][1], tvec[0][2]);
+                var vaxis = new Vector3d(tvec[1][0], tvec[1][1], tvec[1][2]);
+                var texNorm = uaxis.cross(vaxis);
                 double angle = Math.toDegrees(Math.acos(normal.dot(texNorm) / texNorm.length()));
                 writer.put("input_uv_normal", texNorm);
                 writer.put("input_uv_angle", Double.isNaN(angle) ? 0 : angle);
@@ -426,7 +426,7 @@ public class BrushSource extends ModuleDecompile {
         return true;
     }
 
-    public boolean writeModel(int imodel, Vector3f origin, Vector3f angles) {
+    public boolean writeModel(int imodel, Vector3d origin, Vector3d angles) {
         DBrushModel bmodel;
 
         try {

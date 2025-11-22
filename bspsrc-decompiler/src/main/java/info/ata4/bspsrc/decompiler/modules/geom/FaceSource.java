@@ -20,7 +20,7 @@ import info.ata4.bspsrc.decompiler.util.Winding;
 import info.ata4.bspsrc.decompiler.util.WindingFactory;
 import info.ata4.bspsrc.lib.BspFileReader;
 import info.ata4.bspsrc.lib.struct.*;
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -225,7 +225,7 @@ public class FaceSource extends ModuleDecompile {
         }
     }
 
-    public void writeModel(int imodel, Vector3f origin, Vector3f angles) {
+    public void writeModel(int imodel, Vector3d origin, Vector3d angles) {
         DModel model;
 
         try {
@@ -247,7 +247,7 @@ public class FaceSource extends ModuleDecompile {
     /**
      * Writes a flat face as a brush.
      */
-    public void writeFace(int iface, boolean orig, Vector3f origin, Vector3f angles) {
+    public void writeFace(int iface, boolean orig, Vector3d origin, Vector3d angles) {
         DFace face = orig ? bsp.origFaces.get(iface) : bsp.faces.get(iface);
 
         if (face.numedge < 2) {
@@ -268,11 +268,11 @@ public class FaceSource extends ModuleDecompile {
         }
 
         // calculate plane vectors
-        Vector3f[] plane = wind.buildPlane();
+        var plane = wind.buildPlane();
 
-        Vector3f e1 = plane[0];
-        Vector3f e2 = plane[1];
-        Vector3f e3 = plane[2];
+        var e1 = plane[0];
+        var e2 = plane[1];
+        var e3 = plane[2];
 
         if (!e1.isValid() || !e2.isValid() || !e3.isValid()) {
             L.warn("Face with wind {} is invalid", wind);
@@ -280,9 +280,9 @@ public class FaceSource extends ModuleDecompile {
         }
 
         // calculate plane normal
-        Vector3f ev12 = e2.sub(e1);
-        Vector3f ev13 = e3.sub(e1);
-        Vector3f normal = ev12.cross(ev13).normalize();
+        var ev12 = e2.sub(e1);
+        var ev13 = e3.sub(e1);
+        var normal = ev12.cross(ev13).normalize();
 
         if (normal.isNaN() || normal.isInfinite()) {
             // TODO: is there a way to fix/avoid this?
@@ -377,20 +377,20 @@ public class FaceSource extends ModuleDecompile {
     /**
      * Writes prismatic back brush sides for a face
      */
-    private void writePrismBack(Winding wind, Texture texture, float depth) {
-        Vector3f[] plane = wind.buildPlane();
+    private void writePrismBack(Winding wind, Texture texture, double depth) {
+        var plane = wind.buildPlane();
 
-        Vector3f e1 = plane[0];
-        Vector3f e2 = plane[1];
-        Vector3f e3 = plane[2];
+        var e1 = plane[0];
+        var e2 = plane[1];
+        var e3 = plane[2];
 
         // calculate plane normal
-        Vector3f ev12 = e2.sub(e1);
-        Vector3f ev13 = e3.sub(e1);
-        Vector3f normal = ev12.cross(ev13).normalize();
+        var ev12 = e2.sub(e1);
+        var ev13 = e3.sub(e1);
+        var normal = ev12.cross(ev13).normalize();
 
         // displace vertices from face in normal direction by depth
-        Vector3f bedge = normal.scalar(depth);
+        var bedge = normal.scalar(depth);
 
         e1 = e1.add(bedge);
         e2 = e2.add(bedge);
@@ -401,7 +401,7 @@ public class FaceSource extends ModuleDecompile {
 
         writeBackSide(texture, e1, e2, e3);
 
-        Vector3f tv2 = bedge.normalize();
+        var tv2 = bedge.normalize();
 
         // write surrounding sides
         int size = wind.size();
@@ -412,11 +412,11 @@ public class FaceSource extends ModuleDecompile {
             e3 = e1.add(bedge);
 
             // e2.sub(e1) results in mirrored texture
-            Vector3f tv1 = e1.sub(e2).normalize();
+            var tv1 = e1.sub(e2).normalize();
 
             // use null vector if the result is invalid
             if (!tv1.isValid()) {
-                tv1 = Vector3f.NULL;
+                tv1 = Vector3d.NULL;
             }
 
             texture.setUAxis(new TextureAxis(tv1));
@@ -433,17 +433,17 @@ public class FaceSource extends ModuleDecompile {
     /**
      * Writes pyramidal back brush sides for a face
      */
-    private void writePyramBack(Winding wind, Texture texture, float depth) {
-        Vector3f[] plane = wind.buildPlane();
+    private void writePyramBack(Winding wind, Texture texture, double depth) {
+        var plane = wind.buildPlane();
 
-        Vector3f e1 = plane[0];
-        Vector3f e2 = plane[1];
-        Vector3f e3 = plane[2];
+        var e1 = plane[0];
+        var e2 = plane[1];
+        var e3 = plane[2];
 
         // calculate plane normal
-        Vector3f ev12 = e2.sub(e1);
-        Vector3f ev13 = e3.sub(e1);
-        Vector3f normal = ev12.cross(ev13).normalize();
+        var ev12 = e2.sub(e1);
+        var ev13 = e3.sub(e1);
+        var normal = ev12.cross(ev13).normalize();
 
         // the coords of the barycenter
         e3 = wind.getCenter();
@@ -511,16 +511,16 @@ public class FaceSource extends ModuleDecompile {
      * @param prism use prismatic back sides if true, pyramidal otherwise
      * @param depth extrude polygon by this depth
      */
-    public void writePolygon(Winding wind, String frontMaterial, String backMaterial, boolean prism, float depth) {
+    public void writePolygon(Winding wind, String frontMaterial, String backMaterial, boolean prism, double depth) {
         if (wind.isEmpty() || wind.size() < 3) {
             return;
         }
 
-        Vector3f[] plane = wind.buildPlane();
+        var plane = wind.buildPlane();
 
-        Vector3f e1 = plane[0];
-        Vector3f e2 = plane[1];
-        Vector3f e3 = plane[2];
+        var e1 = plane[0];
+        var e2 = plane[1];
+        var e3 = plane[2];
 
         if (!e1.isValid() || !e2.isValid() || !e3.isValid()) {
             L.warn("Areaportal with wind {} is invalid", wind);
@@ -528,9 +528,9 @@ public class FaceSource extends ModuleDecompile {
         }
 
         // calculate plane normal
-        Vector3f ev12 = e2.sub(e1);
-        Vector3f ev13 = e3.sub(e1);
-        Vector3f normal = ev12.cross(ev13).normalize();
+        var ev12 = e2.sub(e1);
+        var ev13 = e3.sub(e1);
+        var normal = ev12.cross(ev13).normalize();
 
         if (normal.isNaN() || normal.isInfinite()) {
             // TODO: is there a way to fix/avoid this?
@@ -571,7 +571,7 @@ public class FaceSource extends ModuleDecompile {
         writePolygon(wind, frontMaterial, backMaterial, prism, config.backfaceDepth);
     }
 
-    public void writePolygon(Winding wind, String material, boolean prism, float depth) {
+    public void writePolygon(Winding wind, String material, boolean prism, double depth) {
         writePolygon(wind, material, material, prism, depth);
     }
 
@@ -582,7 +582,7 @@ public class FaceSource extends ModuleDecompile {
     /**
      * Write a brush side with the given texture and plane
      */
-    private void writeBackSide(Texture texture, Vector3f e1, Vector3f e2, Vector3f e3) {
+    private void writeBackSide(Texture texture, Vector3d e1, Vector3d e2, Vector3d e3) {
         writer.start("side");
         writer.put("id", vmfmeta.getUID());
         writer.put("plane", e1, e3, e2);
@@ -764,7 +764,7 @@ public class FaceSource extends ModuleDecompile {
         }
 
         writer.put("power", di.power);
-        writer.put("startposition", di.startPos, 2);
+        writer.put("startposition", di.startPos.toDouble(), 2);
         writer.put("flags", di.getSurfaceFlags());
         writer.put("elevation", 0);
         writer.put("subdiv", 0);
@@ -845,9 +845,10 @@ public class FaceSource extends ModuleDecompile {
             DFace origFace = bsp.origFaces.get(i);
 
             // recalculate face area when required
+            // TODO: Don't change original DFace data...
             if (origFace.area == 0) {
                 Winding wind = windingFactory.fromFace(bsp, origFace);
-                origFace.area = wind.getArea();
+                origFace.area = (float) wind.getArea();
             }
 
             if (L.isTraceEnabled()) {

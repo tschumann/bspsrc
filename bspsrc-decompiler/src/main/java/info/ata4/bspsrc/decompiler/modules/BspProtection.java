@@ -18,7 +18,7 @@ import info.ata4.bspsrc.lib.entity.Entity;
 import info.ata4.bspsrc.lib.struct.DBrush;
 import info.ata4.bspsrc.lib.struct.DBrushSide;
 import info.ata4.bspsrc.lib.struct.DPlane;
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -52,9 +52,9 @@ public class BspProtection extends ModuleRead {
     private static final float ALIGNED_ALPHA = 0.99f;
     private static final float NODRAW_RATIO_LIMIT = 0.9f;
 
-    private static final Vector3f PB1 = new Vector3f(1, 4, 9);
-    private static final Vector3f PB2 = new Vector3f(4, 9, 1);
-    private static final Vector3f PB3 = new Vector3f(9, 1, 4);
+    private static final Vector3d PB1 = new Vector3d(1, 4, 9);
+    private static final Vector3d PB2 = new Vector3d(4, 9, 1);
+    private static final Vector3d PB3 = new Vector3d(9, 1, 4);
 
     // logger
     private static final Logger L = LogManager.getLogger();
@@ -231,7 +231,7 @@ public class BspProtection extends ModuleRead {
             }
 
             // get brush dimensions
-            Vector3f bsize = brushBounds.getBounds(bsp, b).getSize();
+            var bsize = brushBounds.getBounds(bsp, b).getSize();
 
             // check brush dimensions with prefab constants
             if (PB1.sub(bsize).length() < EPS_SIZE) {

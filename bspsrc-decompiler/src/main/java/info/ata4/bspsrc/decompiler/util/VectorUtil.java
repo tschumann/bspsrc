@@ -1,7 +1,6 @@
 package info.ata4.bspsrc.decompiler.util;
 
 import info.ata4.bspsrc.lib.struct.*;
-import info.ata4.bspsrc.lib.vector.Vector3f;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,13 +59,13 @@ public class VectorUtil {
             return 0;
         }
 
-        Vector3f origin = w1.get(0);
-        Vector3f vec1 = w1.get(1).sub(origin);
-        Vector3f vec2 = w1.get(2).sub(origin);
-        Vector3f planeNormal = vec2.cross(vec1).normalize();
+        var origin = w1.get(0);
+        var vec1 = w1.get(1).sub(origin);
+        var vec2 = w1.get(2).sub(origin);
+        var planeNormal = vec2.cross(vec1).normalize();
 
-        Vector3f axis1 = w1.get(1).sub(origin).normalize(); //Random vector orthogonal to planeNormal
-        Vector3f axis2 = axis1.cross(planeNormal).normalize(); //Vector orthogonal to axis1 and planeNormal
+        var axis1 = w1.get(1).sub(origin).normalize(); //Random vector orthogonal to planeNormal
+        var axis2 = axis1.cross(planeNormal).normalize(); //Vector orthogonal to axis1 and planeNormal
 
         //Map 3d coordinates of windings to 2d (2d coordinates on the plane they lie on)
         // TODO: This can create colinear/degenerated vertices

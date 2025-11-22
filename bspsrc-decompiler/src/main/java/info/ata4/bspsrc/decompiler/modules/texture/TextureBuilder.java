@@ -11,7 +11,7 @@ package info.ata4.bspsrc.decompiler.modules.texture;
 
 import info.ata4.bspsrc.decompiler.util.OccluderMapper;
 import info.ata4.bspsrc.lib.struct.*;
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,9 +34,9 @@ public class TextureBuilder {
     private final OccluderMapper.ReallocationData occReallocationData;
 
     private Texture texture;
-    private Vector3f origin;
-    private Vector3f angles;
-    private Vector3f normal;
+    private Vector3d origin;
+    private Vector3d angles;
+    private Vector3d normal;
     private DTexInfo texinfo;
     private DTexData texdata;
 
@@ -170,23 +170,23 @@ public class TextureBuilder {
         }
 
         // calculate the projections of the surface normal onto the world axes
-        float dotX = Math.abs(Vector3f.BASE_VECTOR_X.dot(normal));
-        float dotY = Math.abs(Vector3f.BASE_VECTOR_Y.dot(normal));
-        float dotZ = Math.abs(Vector3f.BASE_VECTOR_Z.dot(normal));
+        var dotX = Math.abs(Vector3d.BASE_VECTOR_X.dot(normal));
+        var dotY = Math.abs(Vector3d.BASE_VECTOR_Y.dot(normal));
+        var dotZ = Math.abs(Vector3d.BASE_VECTOR_Z.dot(normal));
 
-        Vector3f vdir;
+        Vector3d vdir;
 
         // if the projection of the surface normal onto the z-axis is greatest
         if (dotZ > dotX && dotZ > dotY) {
             // use y-axis as basis
-            vdir = Vector3f.BASE_VECTOR_Y;
+            vdir = Vector3d.BASE_VECTOR_Y;
         } else {
             // otherwise use z-axis as basis
-            vdir = Vector3f.BASE_VECTOR_Z;
+            vdir = Vector3d.BASE_VECTOR_Z;
         }
 
-        Vector3f tv1 = normal.cross(vdir).normalize(); // 1st tex vector
-        Vector3f tv2 = normal.cross(tv1).normalize();  // 2nd tex vector
+        var tv1 = normal.cross(vdir).normalize(); // 1st tex vector
+        var tv2 = normal.cross(tv1).normalize();  // 2nd tex vector
 
         texture.setUAxis(new TextureAxis(tv1));
         texture.setVAxis(new TextureAxis(tv2));
@@ -200,7 +200,7 @@ public class TextureBuilder {
             return;
         }
 
-        Vector3f texNorm = texture.getUAxis().axis.cross(texture.getVAxis().axis);
+        var texNorm = texture.getUAxis().axis.cross(texture.getVAxis().axis);
         if (Math.abs(normal.dot(texNorm)) >= EPS_PERP) {
             return;
         }
@@ -211,30 +211,30 @@ public class TextureBuilder {
     private void buildLightmapScale() {
         // extract lightmap vectors
         float[][] lvec = texinfo.lightmapVecsLuxels;
-        Vector3f uaxis = new Vector3f(lvec[0][0], lvec[0][1], lvec[0][2]);
-        Vector3f vaxis = new Vector3f(lvec[1][0], lvec[1][1], lvec[1][2]);
+        var uaxis = new Vector3d(lvec[0][0], lvec[0][1], lvec[0][2]);
+        var vaxis = new Vector3d(lvec[1][0], lvec[1][1], lvec[1][2]);
 
-        float ls = (uaxis.length() + vaxis.length()) / 2.0f;
+        var ls = (uaxis.length() + vaxis.length()) / 2.0;
 
-        if (ls > 0.001f) {
-            texture.setLightmapScale(Math.round(1.0f / ls));
+        if (ls > 0.001) {
+            texture.setLightmapScale((int) Math.round(1.0 / ls));
         }
     }
 
     private void buildUV() {        
         // extract texture vectors
-        float[][] tvec = texinfo.textureVecsTexels;
-        Vector3f uaxis = new Vector3f(tvec[0][0], tvec[0][1], tvec[0][2]);
-        Vector3f vaxis = new Vector3f(tvec[1][0], tvec[1][1], tvec[1][2]);
+        var tvec = texinfo.textureVecsTexels;
+        var uaxis = new Vector3d(tvec[0][0], tvec[0][1], tvec[0][2]);
+        var vaxis = new Vector3d(tvec[1][0], tvec[1][1], tvec[1][2]);
 
-        float utw = 1.0f / uaxis.length();
-        float vtw = 1.0f / vaxis.length();
+        var utw = 1.0 / uaxis.length();
+        var vtw = 1.0 / vaxis.length();
 
         uaxis = uaxis.scalar(utw);
         vaxis = vaxis.scalar(vtw);
 
-        float ushift = tvec[0][3];
-        float vshift = tvec[1][3];
+        var ushift = (double) tvec[0][3];
+        var vshift = (double) tvec[1][3];
 
         // translate to origin
         if (origin != null) {
@@ -248,7 +248,7 @@ public class TextureBuilder {
             vaxis = vaxis.rotate(angles);
 
             // calculate the shift in U/V space due to this rotation
-            Vector3f shift = Vector3f.NULL;
+            var shift = Vector3d.NULL;
 
             if (origin != null) {
                 shift = shift.sub(origin);
@@ -278,19 +278,19 @@ public class TextureBuilder {
         vtw = Math.round(vtw * 10000) / 10000f;
 
         // create texture axes
-        texture.setUAxis(new TextureAxis(uaxis, Math.round(ushift), utw));
-        texture.setVAxis(new TextureAxis(vaxis, Math.round(vshift), vtw));
+        texture.setUAxis(new TextureAxis(uaxis, (int) Math.round(ushift), utw));
+        texture.setVAxis(new TextureAxis(vaxis, (int) Math.round(vshift), vtw));
     }
 
-    public void setOrigin(Vector3f origin) {
+    public void setOrigin(Vector3d origin) {
         this.origin = origin;
     }
 
-    public void setAngles(Vector3f angles) {
+    public void setAngles(Vector3d angles) {
         this.angles = angles;
     }
 
-    public void setNormal(Vector3f normal) {
+    public void setNormal(Vector3d normal) {
         this.normal = normal;
     }
 

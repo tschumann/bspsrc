@@ -11,12 +11,11 @@ package info.ata4.bspsrc.decompiler.util;
 
 import info.ata4.bspsrc.lib.app.SourceAppId;
 import info.ata4.bspsrc.lib.struct.*;
-import info.ata4.bspsrc.lib.vector.Vector3f;
+import info.ata4.bspsrc.lib.vector.Vector3d;
 import info.ata4.bspsrc.lib.vector.VectorXf;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -61,7 +60,7 @@ public class WindingFactory {
             return faceCache.get(face);
         }
 
-        List<Vector3f> verts = new ArrayList<>();
+        var verts = new ArrayList<Vector3d>();
 
         for (int i = 0; i < face.numedge; i++) {
             int v;
@@ -75,7 +74,7 @@ public class WindingFactory {
                 v = bsp.edges.get(sedge).v[0];
             }
 
-            verts.add(bsp.verts.get(v).point);
+            verts.add(bsp.verts.get(v).point.toDouble());
         }
 
         Winding w = new Winding(verts);
@@ -163,7 +162,7 @@ public class WindingFactory {
         }
 
         Winding w = bsp.clipPortalVerts.subList(ap.firstClipPortalVert, ap.firstClipPortalVert + ap.clipPortalVerts).stream()
-                .map(dVertex -> dVertex.point)
+                .map(dVertex -> dVertex.point.toDouble())
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Winding::new));
 
         areaportalCache.put(ap, w);
@@ -183,11 +182,11 @@ public class WindingFactory {
             return occluderCache.get(opd);
         }
 
-        List<Vector3f> verts = new ArrayList<>();
+        var verts = new ArrayList<Vector3d>();
 
         for (int k = 0; k < opd.vertexcount; k++) {
             int pvi = bsp.occluderVerts.get(opd.firstvertexindex + k);
-            verts.add(bsp.verts.get(pvi).point);
+            verts.add(bsp.verts.get(pvi).point.toDouble());
         }
 
         Winding w = new Winding(verts);
@@ -208,14 +207,16 @@ public class WindingFactory {
         if (planeCache.containsKey(pl)) {
             return planeCache.get(pl);
         }
+        
+        var plNormal = pl.normal.toDouble();
 
         // find the dominant axis of plane normal
-        float dmax = -1.0F;
+        double dmax = -1.0;
         int idir = -1;
 
         // for each axis
-        for (int i = 0; i < pl.normal.size(); i++) {
-            float dc = Math.abs(pl.normal.get(i));
+        for (int i = 0; i < plNormal.size(); i++) {
+            double dc = Math.abs(plNormal.get(i));
             // find the biggest component
             if (dc <= dmax) {
                 continue;
@@ -230,36 +231,36 @@ public class WindingFactory {
         }
 
         // this will be the "upwards" pointing vector
-        Vector3f vup = Vector3f.NULL;
+        Vector3d vup = Vector3d.NULL;
 
         switch (idir) {
             case Winding.SIDE_FRONT:
             case Winding.SIDE_BACK:
                 // use z unit vector
-                vup = new Vector3f(0, 0, 1);
+                vup = new Vector3d(0, 0, 1);
                 break;
             case Winding.SIDE_ON:
                 // use x unit vector
-                vup = new Vector3f(1, 0, 0);
+                vup = new Vector3d(1, 0, 0);
         }
 
         // remove the component of this vector along the normal
-        float vdot = vup.dot(pl.normal);
-        vup = vup.add(pl.normal.scalar(-vdot));
+        var vdot = vup.dot(plNormal);
+        vup = vup.add(plNormal.scalar(-vdot));
 
         // make it a unit (perpendicular)
         vup = vup.normalize();
 
         // the vector from origin perpendicularly touching plane
-        Vector3f org = pl.normal.scalar(pl.dist);
+        Vector3d org = plNormal.scalar(pl.dist);
 
         // this is the "rightwards" pointing vector
-        Vector3f vrt = vup.cross(pl.normal);
+        Vector3d vrt = vup.cross(plNormal);
 
         vup = vup.scalar(maxLen);
         vrt = vrt.scalar(maxLen);
 
-        List<Vector3f> verts = new ArrayList<>();
+        var verts = new ArrayList<Vector3d>();
 
         // move diagonally away from org to create the corner verts
         verts.add(org.sub(vrt).add(vup)); // left up
@@ -287,8 +288,8 @@ public class WindingFactory {
      * @return true if winding is huge
      */
     public boolean isHuge(Winding winding) {
-        for (Vector3f point : winding) {
-            for (float value : point) {
+        for (var point : winding) {
+            for (var value : point) {
                 if (Math.abs(value) > maxCoord) {
                     return true;
                 }
