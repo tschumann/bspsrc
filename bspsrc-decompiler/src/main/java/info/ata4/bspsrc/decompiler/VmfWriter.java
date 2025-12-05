@@ -23,6 +23,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Class to write formatted VMF files.
@@ -106,6 +107,10 @@ public class VmfWriter implements Closeable {
 
     public void put(String key, int value) {
         put(key, String.valueOf(value));
+    }
+
+    public void put(String key, int... values) {
+        put(key, Arrays.stream(values).mapToObj(Integer::toString).collect(Collectors.joining(" ")));
     }
 
     public void put(String key, long value) {

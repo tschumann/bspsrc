@@ -890,7 +890,7 @@ public class EntitySource extends ModuleDecompile {
             writer.start("entity");
             writer.put("id", vmfmeta.getUID());
             writer.put("classname", "env_cubemap");
-            writer.put("origin", new Vector3f(cm.origin[0], cm.origin[1], cm.origin[2]));
+            writer.put("origin", cm.origin[0], cm.origin[1], cm.origin[2]);
             writer.put("cubemapsize", cm.size);
 
             // FIXME: results are too bad, find a better way
