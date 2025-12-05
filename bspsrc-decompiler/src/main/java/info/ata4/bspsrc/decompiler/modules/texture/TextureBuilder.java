@@ -272,11 +272,6 @@ public class TextureBuilder {
             vshift %= texdata.height;
         }
 
-        // round scales to 4 decimal digits to fix round-off errors
-        // (e.g.: 0.25000018 -> 0.25)
-        utw = Math.round(utw * 10000) / 10000f;
-        vtw = Math.round(vtw * 10000) / 10000f;
-
         // create texture axes
         texture.setUAxis(new TextureAxis(uaxis, (int) Math.round(ushift), utw));
         texture.setVAxis(new TextureAxis(vaxis, (int) Math.round(vshift), vtw));

@@ -226,9 +226,19 @@ public class BspSource {
     private VmfWriter getVmfWriter(File vmfFile) throws IOException {
         // write to file or omit output?
         if (config.nullOutput) {
-            return new VmfWriter(OutputStream.nullOutputStream());
+            return new VmfWriter(
+                    OutputStream.nullOutputStream(),
+                    config.vmfDoubleScale,
+                    config.vmfDoubleScaleTextureAxes,
+                    config.vmfDoubleScaleTextureScale
+            );
         } else {
-            return new VmfWriter(vmfFile);
+            return new VmfWriter(
+                    vmfFile,
+                    config.vmfDoubleScale,
+                    config.vmfDoubleScaleTextureAxes,
+                    config.vmfDoubleScaleTextureScale
+            );
         }
     }
 

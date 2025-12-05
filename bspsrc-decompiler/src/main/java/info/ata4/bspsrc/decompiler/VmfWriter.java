@@ -35,14 +35,39 @@ public class VmfWriter implements Closeable {
 
     private final PrintWriter pw;
     private final Deque<String> section = new ArrayDeque<>();
-    private final DecimalFormat decimalFormat = new DecimalFormat("0.####", new DecimalFormatSymbols(Locale.ENGLISH));
 
-    public VmfWriter(File file) throws FileNotFoundException, UnsupportedEncodingException {
-        pw = new PrintWriter(file, "US-ASCII");
+    private final int doubleScale;
+    private final int doubleScaleTextureAxes;
+    private final int doubleScaleTextureScale;
+
+    public VmfWriter(
+            PrintWriter pw,
+            int doubleScale,
+            int doubleScaleTextureAxes,
+            int doubleScaleTextureScale
+    ) {
+        this.pw = pw;
+        this.doubleScale = doubleScale;
+        this.doubleScaleTextureAxes = doubleScaleTextureAxes;
+        this.doubleScaleTextureScale = doubleScaleTextureScale;
     }
 
-    public VmfWriter(OutputStream os) {
-        pw = new PrintWriter(os);
+    public VmfWriter(
+            File file,
+            int doubleScale,
+            int doubleScaleTextureAxes,
+            int doubleScaleTextureScale
+    ) throws FileNotFoundException, UnsupportedEncodingException {
+        this(new PrintWriter(file, "US-ASCII"), doubleScale, doubleScaleTextureAxes, doubleScaleTextureScale);
+    }
+
+    public VmfWriter(
+            OutputStream os,
+            int doubleScale,
+            int doubleScaleTextureAxes,
+            int doubleScaleTextureScale
+    ) {
+        this(new PrintWriter(os), doubleScale, doubleScaleTextureAxes, doubleScaleTextureScale);
     }
 
     private void indent() {
@@ -88,11 +113,11 @@ public class VmfWriter implements Closeable {
     }
 
     public void put(String key, float value) {
-        put(key, formatFloat(value));
+        put(key, formatFloat(value, doubleScale));
     }
 
     public void put(String key, double value) {
-        put(key, formatFloat(value));
+        put(key, formatFloat(value, doubleScale));
     }
 
     public void put(String key, boolean value) {
@@ -120,15 +145,9 @@ public class VmfWriter implements Closeable {
     }
 
     public void put(String key, Vector3d v1, Vector3d v2, Vector3d v3) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(formatVector3d(v1, 1));
-        sb.append(' ');
-        sb.append(formatVector3d(v2, 1));
-        sb.append(' ');
-        sb.append(formatVector3d(v3, 1));
-
-        put(key, sb.toString());
+        put(key, formatVector3d(v1, 1) + " "
+                + formatVector3d(v2, 1) + " "
+                + formatVector3d(v3, 1));
     }
 
     public void put(String key, TextureAxis axis) {
@@ -171,9 +190,9 @@ public class VmfWriter implements Closeable {
             L.warn("Invalid vector: {}", v);
             sb.append("0 0 0");
         } else {
-            sb.append(formatFloat(v.x())).append(' ');
-            sb.append(formatFloat(v.y())).append(' ');
-            sb.append(formatFloat(v.z()));
+            sb.append(formatFloat(v.x(), doubleScale)).append(' ');
+            sb.append(formatFloat(v.y(), doubleScale)).append(' ');
+            sb.append(formatFloat(v.z(), doubleScale));
         }
 
         if (p == 1) {
@@ -193,20 +212,30 @@ public class VmfWriter implements Closeable {
             L.warn("Invalid vector: {}", tx.axis);
             sb.append("0 0 0 ");
         } else {
-            sb.append(formatFloat(tx.axis.x())).append(' ');
-            sb.append(formatFloat(tx.axis.y())).append(' ');
-            sb.append(formatFloat(tx.axis.z())).append(' ');
+            sb.append(formatFloat(tx.axis.x(), doubleScaleTextureAxes)).append(' ');
+            sb.append(formatFloat(tx.axis.y(), doubleScaleTextureAxes)).append(' ');
+            sb.append(formatFloat(tx.axis.z(), doubleScaleTextureAxes)).append(' ');
         }
 
-        sb.append(formatFloat(tx.shift));
+        sb.append(tx.shift);
         sb.append("] ");
-        sb.append(formatFloat(tx.tw));
+        sb.append(formatFloat(tx.tw, doubleScaleTextureScale));
 
         return sb.toString();
     }
 
-    private String formatFloat(double f) {
-        return decimalFormat.format(f);
+    private static final ThreadLocal<Map<Integer, DecimalFormat>> FORMATTERS = ThreadLocal.withInitial(HashMap::new);
+    private static DecimalFormat createFormatter(int decimalPlaces) {
+        return new DecimalFormat("0." + "#".repeat(decimalPlaces), new DecimalFormatSymbols(Locale.ENGLISH));
+    }
+
+    private String formatFloat(double f, int decimalPlaces) {
+        if (decimalPlaces == 0)
+            return Double.toString(f);
+
+        return FORMATTERS.get()
+                .computeIfAbsent(decimalPlaces, VmfWriter::createFormatter)
+                .format(f);
     }
 
     @Override

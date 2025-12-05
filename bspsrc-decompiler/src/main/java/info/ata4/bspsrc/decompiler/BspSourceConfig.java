@@ -71,6 +71,10 @@ public final class BspSourceConfig {
     public boolean unpackEmbedded = false;
     public boolean smartUnpack = true;
 
+    public int vmfDoubleScale = 8;
+    public int vmfDoubleScaleTextureAxes = 4;
+    public int vmfDoubleScaleTextureScale = 4;
+
     public BspSourceConfig() {}
 
     /**
@@ -115,6 +119,10 @@ public final class BspSourceConfig {
         this.writeCameras = config.writeCameras;
         this.unpackEmbedded = config.unpackEmbedded;
         this.smartUnpack = config.smartUnpack;
+
+        this.vmfDoubleScale = config.vmfDoubleScale;
+        this.vmfDoubleScaleTextureAxes = config.vmfDoubleScaleTextureAxes;
+        this.vmfDoubleScaleTextureScale = config.vmfDoubleScaleTextureScale;
     }
 
     public void dumpToLog() {
