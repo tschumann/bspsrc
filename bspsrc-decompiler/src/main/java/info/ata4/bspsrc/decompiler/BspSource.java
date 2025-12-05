@@ -125,7 +125,7 @@ public class BspSource {
         try (var closeable = CloseableThreadContext.put(DECOMPILE_TASK_ID_IDENTIFIER, uuid.toString())) {
             outputQueue.add(new Signal.TaskStarted(index));
             try {
-                decompile(entry);
+                decompile(entry, config);
                 outputQueue.add(new Signal.TaskFinished(index));
             } catch (Throwable e) {
                 L.error("Error occurred decompiling '%s'".formatted(entry.getBspFile()),  e);
@@ -137,7 +137,7 @@ public class BspSource {
     /**
      * Starts the decompiling process
      */
-    private void decompile(BspFileEntry entry) throws BspSourceException, BspException {
+    public static void decompile(BspFileEntry entry, BspSourceConfig config) throws BspSourceException, BspException {
         Path bspFile = entry.getBspFile();
         Path vmfFile = entry.getVmfFile();
 
@@ -210,7 +210,7 @@ public class BspSource {
         }
 
         // create and configure decompiler and start decompiling
-        try (VmfWriter writer = getVmfWriter(vmfFile.toFile())) {
+        try (VmfWriter writer = getVmfWriter(vmfFile.toFile(), config)) {
             BspDecompiler decompiler = new BspDecompiler(reader, writer, config);
 
             if (nmo != null)
@@ -223,7 +223,7 @@ public class BspSource {
         }
     }
 
-    private VmfWriter getVmfWriter(File vmfFile) throws IOException {
+    private static VmfWriter getVmfWriter(File vmfFile, BspSourceConfig config) throws IOException {
         // write to file or omit output?
         if (config.nullOutput) {
             return new VmfWriter(
