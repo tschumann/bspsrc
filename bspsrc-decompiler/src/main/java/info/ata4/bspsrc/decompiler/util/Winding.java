@@ -221,11 +221,11 @@ public class Winding implements List<Vector3d> {
 
         Winding result = this;
         for (int i = 0; i < other.size(); i++) {
-            Vector3d edge = other.get(i).sub(other.get((i + 1) % other.size()));
+            Vector3d edge = other.get((i + 1) % other.size()).sub(other.get(i));
             Vector3d normal = edge.cross(projNormal).normalize();
             double dist = normal.dot(other.get(i));
 
-            result = result.clipEpsilon(normal, dist, EPS_SPLIT, true);
+            result = result.clipEpsilon(normal, dist, EPS_SPLIT, false);
         }
         return result;
     }
