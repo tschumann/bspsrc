@@ -2,9 +2,6 @@ package info.ata4.bspsrc.decompiler.util;
 
 import info.ata4.bspsrc.lib.struct.*;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 public class VectorUtil {
 
     public static double matchingAreaPercentage(
@@ -14,15 +11,13 @@ public class VectorUtil {
             BspData bsp,
             WindingFactory windingFactory
     ) {
-        if (occluderPolyData.planenum == brushSide.pnum) {
-            return internalMatchingAreaPercentage(
-                    windingFactory.fromOccluder(bsp, occluderPolyData),
-                    windingFactory.fromSide(bsp, brush, brushSide),
-                    windingFactory
-            );
-        } else {
+        if (occluderPolyData.planenum != brushSide.pnum)
             return 0;
-        }
+
+        var w1 = windingFactory.fromOccluder(bsp, occluderPolyData);
+        var w2 = windingFactory.fromSide(bsp, brush, brushSide);
+        var clippedWinding = w1.clipWinding(w2, bsp.planes.get(brushSide.pnum).normal.toDouble());
+        return clippedWinding.getArea() / w1.getArea();
     }
 
     public static double matchingAreaPercentage(
@@ -35,59 +30,9 @@ public class VectorUtil {
         if (areaportal.planenum != brushSide.pnum)
             return 0;
 
-        return internalMatchingAreaPercentage(
-                windingFactory.fromAreaportal(bsp, areaportal),
-                windingFactory.fromSide(bsp, brush, brushSide),
-                windingFactory
-        );
-    }
-
-    /**
-     * Returns the intersecting area of two Windings in percentage to w1 total area (0-1)
-     * <p><b>This assumes that the 2 windings are valid and lie on the same plane!!!
-     *
-     * @param w1 the first winding
-     * @param w2 the second winding
-     * @return A probability in the form of a double ranging from 0 to 1
-     */
-    private static double internalMatchingAreaPercentage(Winding w1, Winding w2, WindingFactory windingFactory) {
-        w1 = w1.removeDegenerated().removeCollinear();
-        w2 = w2.removeDegenerated().removeCollinear();
-
-        // In case the provided windings are invalid, return 0!
-        if (w1.size() < 3 || w2.size() < 3 || windingFactory.isHuge(w1) || windingFactory.isHuge(w2)) {
-            return 0;
-        }
-
-        var origin = w1.get(0);
-        var vec1 = w1.get(1).sub(origin);
-        var vec2 = w1.get(2).sub(origin);
-        var planeNormal = vec2.cross(vec1).normalize();
-
-        var axis1 = w1.get(1).sub(origin).normalize(); //Random vector orthogonal to planeNormal
-        var axis2 = axis1.cross(planeNormal).normalize(); //Vector orthogonal to axis1 and planeNormal
-
-        //Map 3d coordinates of windings to 2d (2d coordinates on the plane they lie on)
-        // TODO: This can create colinear/degenerated vertices
-        ConvexPolygon w1Polygon = w1.stream()
-                .map(vertex -> vertex.projectOnPlane(origin, axis1, axis2))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), ConvexPolygon::new));
-
-        ConvexPolygon w2Polygon = w2.stream()
-                .map(vertex -> vertex.projectOnPlane(origin, axis1, axis2))
-                .collect(Collectors.collectingAndThen(Collectors.toList(), ConvexPolygon::new));
-
-        Optional<ConvexPolygon> intersectionPolygon = w1Polygon.getIntersectionPolygon(w2Polygon);
-        if (intersectionPolygon.isPresent()) {
-            float intersectionArea = intersectionPolygon.get().getArea();
-            // error margin
-            if (intersectionArea < 1) {
-                intersectionArea = 0;
-            }
-
-            return Math.min(intersectionArea / w1Polygon.getArea(), 1);
-        } else {
-            return 0;
-        }
+        var w1 = windingFactory.fromAreaportal(bsp, areaportal);
+        var w2 = windingFactory.fromSide(bsp, brush, brushSide);
+        var clippedWinding = w1.clipWinding(w2, bsp.planes.get(brushSide.pnum).normal.toDouble());
+        return clippedWinding.getArea() / w1.getArea();
     }
 }

@@ -1,8 +1,5 @@
 package info.ata4.bspsrc.lib.vector;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 public final class Vector3d extends VectorXd<Vector3d> {
     
     // frequently used pre-defined vectors
@@ -113,24 +110,5 @@ public final class Vector3d extends VectorXd<Vector3d> {
 
         // 4. Return the new vector
         return new Vector3d(rotated_vx, rotated_vy, rotated_vz);
-    }
-
-    /// Projects this 3D vector onto a 2D plane defined by an origin point and two
-    /// orthogonal axis vectors.
-    ///
-    /// @param origin The origin point of the 2D plane.
-    /// @param axis1 The X-axis of the 2D plane (must be normalized and orthogonal to axis2).
-    /// @param axis2 The Y-axis of the 2D plane (must be normalized and orthogonal to axis1).
-    /// @return A new `Vector2f` representing the projected point on the plane.
-    public Vector2f projectOnPlane(Vector3d origin, Vector3d axis1, Vector3d axis2) {
-        throw new UnsupportedOperationException();
-    }
-    
-    public Vector3d round(int decimalPlaces) {
-        return new Vector3d(
-                new BigDecimal(x()).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue(),
-                new BigDecimal(y()).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue(),
-                new BigDecimal(z()).setScale(decimalPlaces, RoundingMode.HALF_UP).doubleValue()
-        );
     }
 }
