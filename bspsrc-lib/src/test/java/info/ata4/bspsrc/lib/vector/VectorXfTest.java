@@ -52,21 +52,14 @@ abstract class VectorXfTest<T extends VectorXf<T>> {
         private abstract class AbstractConstructor {
 
             protected abstract T create(float[] elements);
-            protected abstract float[] getNewElements();
 
             @DisplayName("Test constructor instantiation")
             @Test
             void testConstructorInstantiation() {
-                float[] elements = getNewElements();
+                float[] elements = randomFloats();
                 T vec = create(elements);
-
                 float[] actualElements = getElements(vec);
-                for (int i = 0; i < actualElements.length; i++) {
-                    assertEquals(elements[i], actualElements[i],
-                            "Actual value for component " + i + " doesn't match expected");
-                }
-                assertEquals(size(), vec.size(),
-                        "Actual size of the instantiated vector doesn't match expected");
+                assertArrayEquals(elements, actualElements);
             }
         }
 
@@ -78,11 +71,6 @@ abstract class VectorXfTest<T extends VectorXf<T>> {
             protected T create(float[] elements) {
                 return constructor(elements);
             }
-
-            @Override
-            protected float[] getNewElements() {
-                return randomFloats();
-            }
         }
 
         abstract class AbstractConstructorArray extends AbstractConstructors.AbstractConstructor {
@@ -92,11 +80,6 @@ abstract class VectorXfTest<T extends VectorXf<T>> {
             @Override
             protected T create(float[] elements) {
                 return constructor(elements);
-            }
-
-            @Override
-            protected float[] getNewElements() {
-                return randomFloats();
             }
 
             @DisplayName("Fail on to few elements")
@@ -118,7 +101,7 @@ abstract class VectorXfTest<T extends VectorXf<T>> {
         @Nested
         class Getter {
 
-            @DisplayName("Test gettings values")
+            @DisplayName("Test getting values")
             @Test
             void testValues() {
                 float[] actualElements = randomFloats();
