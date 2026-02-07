@@ -56,7 +56,7 @@ public final class Vector2f extends VectorXf<Vector2f> {
 	/// @param array The float array.
 	/// @return A new `Vector2f` instance.
 	/// @throws IllegalArgumentException if the array length is not 2.
-	public static Vector2f from_array(float[] array) {
+	public static Vector2f fromArray(float[] array) {
 		verifySize(array, 2);
 		return new Vector2f(array.clone());
 	}

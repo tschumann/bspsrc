@@ -50,7 +50,7 @@ class Vector4fTest extends VectorXfTest<Vector4f> {
 
             @Override
             protected Vector4f constructor(float[] elements) {
-                return Vector4f.from_array(elements);
+                return Vector4f.fromArray(elements);
             }
         }
     }

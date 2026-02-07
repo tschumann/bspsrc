@@ -54,7 +54,7 @@ class Vector2fTest extends VectorXfTest<Vector2f> {
 
             @Override
             protected Vector2f constructor(float[] elements) {
-                return Vector2f.from_array(elements);
+                return Vector2f.fromArray(elements);
             }
         }
     }

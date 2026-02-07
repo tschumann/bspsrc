@@ -53,7 +53,7 @@ class Vector3fTest extends VectorXfTest<Vector3f> {
 
             @Override
             protected Vector3f constructor(float[] elements) {
-                return Vector3f.from_array(elements);
+                return Vector3f.fromArray(elements);
             }
         }
     }

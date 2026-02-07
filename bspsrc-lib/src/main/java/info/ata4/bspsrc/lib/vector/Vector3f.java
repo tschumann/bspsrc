@@ -64,7 +64,7 @@ public final class Vector3f extends VectorXf<Vector3f> {
     /// @param array The float array (must have a length of 3).
     /// @return A new `Vector3f` instance.
     /// @throws IllegalArgumentException if the array length is not 3.
-    public static Vector3f from_array(float[] array) {
+    public static Vector3f fromArray(float[] array) {
         verifySize(array, 3);
         return new Vector3f(array.clone());
     }

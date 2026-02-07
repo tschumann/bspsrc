@@ -61,7 +61,7 @@ public final class Vector4f extends VectorXf<Vector4f> {
     /// @param array The float array (must have a length of 4).
     /// @return A new `Vector4f` instance.
     /// @throws IllegalArgumentException if the array length is not 4.
-    public static Vector4f from_array(float[] array) {
+    public static Vector4f fromArray(float[] array) {
         verifySize(array, 4);
         return new Vector4f(array.clone());
     }
