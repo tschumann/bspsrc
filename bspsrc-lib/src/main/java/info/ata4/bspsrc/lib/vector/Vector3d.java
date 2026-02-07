@@ -47,68 +47,44 @@ public final class Vector3d extends VectorXd<Vector3d> {
         return new Vector3d(rx, ry, rz);
     }
 
+    /// Performs an **extrinsic (X-Y-Z)** rotation sequence in a **right-handed** coordinate system.
+    /// 
     /// @param angles A vector where x, y, z are the rotation angles in **degrees** for the respective axes.
     /// @return A new, rotated vector instance.
     public Vector3d rotate(Vector3d angles) {
         if (angles.x() == 0 && angles.y() == 0 && angles.z() == 0) {
-            // nothing to do here
             return this;
         }
 
-        // Input vector components
-        final double vx = x();
-        final double vy = y();
-        final double vz = z();
+        var vx = x();
+        var vy = y();
+        var vz = z();
 
-        // 1. Convert clockwise degrees to counter-clockwise radians (standard convention)
-        // Clockwise rotation by angle 'theta' is equivalent to CCW rotation by '-theta'.
-        final double phi_x = -Math.toRadians(angles.x());
-        final double phi_y = -Math.toRadians(angles.y());
-        final double phi_z = -Math.toRadians(angles.z());
+        var phi_x = Math.toRadians(angles.x());
+        var phi_y = Math.toRadians(angles.y());
+        var phi_z = Math.toRadians(angles.z());
 
-        // 2. Pre-calculate sines and cosines for efficiency
-        final double cx = Math.cos(phi_x);
-        final double sx = Math.sin(phi_x);
-        final double cy = Math.cos(phi_y);
-        final double sy = Math.sin(phi_y);
-        final double cz = Math.cos(phi_z);
-        final double sz = Math.sin(phi_z);
+        var cx = Math.cos(phi_x);
+        var sx = Math.sin(phi_x);
+        var cy = Math.cos(phi_y);
+        var sy = Math.sin(phi_y);
+        var cz = Math.cos(phi_z);
+        var sz = Math.sin(phi_z);
+        
+        var r00 = cz * cy;
+        var r01 = cz * sy * sx - sz * cx;
+        var r02 = cz * sy * cx + sz * sx;
+        var r10 = sz * cy;
+        var r11 = sz * sy * sx + cz * cx;
+        var r12 = sz * sy * cx - cz * sx;
+        var r20 = -sy;
+        var r21 = cy * sx;
+        var r22 = cy * cx;
 
-        // 3. The Combined Rotation Matrix R is Rz * Ry * Rx (Extrinsic Z-Y-X).
-        // The rotated vector components (v'x, v'y, v'z) are calculated by multiplying
-        // the vector (vx, vy, vz) by the explicit terms of the combined matrix R.
+        var rotated_vx = r00 * vx + r01 * vy + r02 * vz;
+        var rotated_vy = r10 * vx + r11 * vy + r12 * vz;
+        var rotated_vz = r20 * vx + r21 * vy + r22 * vz;
 
-        // --- Row 0 of R (v'_x calculation) ---
-        // R[0][0] = cz * cy
-        final double R00 = cz * cy;
-        // R[0][1] = cz*sy*sx - sz*cx
-        final double R01 = cz * sy * sx - sz * cx;
-        // R[0][2] = cz*sy*cx + sz*sx
-        final double R02 = cz * sy * cx + sz * sx;
-
-        final double rotated_vx = R00 * vx + R01 * vy + R02 * vz;
-
-        // --- Row 1 of R (v'_y calculation) ---
-        // R[1][0] = sz * cy
-        final double R10 = sz * cy;
-        // R[1][1] = sz*sy*sx + cz*cx
-        final double R11 = sz * sy * sx + cz * cx;
-        // R[1][2] = sz*sy*cx - cz*sx
-        final double R12 = sz * sy * cx - cz * sx;
-
-        final double rotated_vy = R10 * vx + R11 * vy + R12 * vz;
-
-        // --- Row 2 of R (v'_z calculation) ---
-        // R[2][0] = -sy
-        final double R20 = -sy;
-        // R[2][1] = cy*sx
-        final double R21 = cy * sx;
-        // R[2][2] = cy*cx
-        final double R22 = cy * cx;
-
-        final double rotated_vz = R20 * vx + R21 * vy + R22 * vz;
-
-        // 4. Return the new vector
         return new Vector3d(rotated_vx, rotated_vy, rotated_vz);
     }
 }

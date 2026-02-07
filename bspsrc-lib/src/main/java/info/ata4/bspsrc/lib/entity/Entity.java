@@ -182,11 +182,19 @@ public class Entity {
             return null;
         }
 
-        // swap pitch yaw roll (Y Z X) axes
+        // Source Engine stores angles in a (Pitch, Yaw, Roll) format mapped to the (X, Y, Z) components of given vector.
+        // To align these with standard 3D space axes:
+        // - Pitch (X) rotates around the Y-axis.
+        // - Yaw   (Y) rotates around the Z-axis.
+        // - Roll  (Z) rotates around the X-axis.
+        //
+        // We reorder the components to (Roll, Pitch, Yaw) so that each angle 
+        // resides in its corresponding axis component (X, Y, Z).
         return new Vector3f(a.z(), a.x(), a.y());
     }
 
     public void setAngles(Vector3f a) {
+        // we need to reorder the angle components, as already explain in #getAngles
         setVector3f("angles", new Vector3f(a.z(), a.x(), a.y()));
     }
 
