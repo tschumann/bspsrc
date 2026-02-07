@@ -229,7 +229,7 @@ public class VmfWriter implements Closeable {
         return sb.toString();
     }
 
-    private static final ThreadLocal<Map<Integer, DecimalFormat>> FORMATTERS = ThreadLocal.withInitial(HashMap::new);
+    private static final Map<Integer, DecimalFormat> FORMATTERS = new HashMap<>();
     private static DecimalFormat createFormatter(int decimalPlaces) {
         return new DecimalFormat("0." + "#".repeat(decimalPlaces), new DecimalFormatSymbols(Locale.ENGLISH));
     }
@@ -238,7 +238,7 @@ public class VmfWriter implements Closeable {
         if (decimalPlaces == 0)
             return Double.toString(f);
 
-        return FORMATTERS.get()
+        return FORMATTERS
                 .computeIfAbsent(decimalPlaces, VmfWriter::createFormatter)
                 .format(f);
     }
