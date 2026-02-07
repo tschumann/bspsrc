@@ -101,40 +101,49 @@ public final class Vector3f extends VectorXf<Vector3f> {
         return new Vector3f(rx, ry, rz);
     }
 
+    /// Performs an **extrinsic (X-Y-Z)** rotation sequence in a **right-handed** coordinate system.
+    ///
     /// @param angles A vector where x, y, z are the rotation angles in **degrees** for the respective axes.
     /// @return A new, rotated vector instance.
     public Vector3f rotate(Vector3f angles) {
         if (angles.x() == 0 && angles.y() == 0 && angles.z() == 0) {
-            // nothing to do here
             return this;
         }
 
-        double rx = x();
-        double ry = y();
-        double rz = z();
+        var vx = x();
+        var vy = y();
+        var vz = z();
 
-        // rotate x (pitch)
-        if (angles.x() != 0) {
-            Point2d p = new Point2d(ry, rz).rotate(angles.x());
-            ry = p.x;
-            rz = p.y;
-        }
+        var phi_x = Math.toRadians(angles.x());
+        var phi_y = Math.toRadians(angles.y());
+        var phi_z = Math.toRadians(angles.z());
 
-        // rotate y (yaw)
-        if (angles.y() != 0) {
-            Point2d p = new Point2d(rx, rz).rotate(-angles.y());
-            rx = p.x;
-            rz = p.y;
-        }
+        var cx = Math.cos(phi_x);
+        var sx = Math.sin(phi_x);
+        var cy = Math.cos(phi_y);
+        var sy = Math.sin(phi_y);
+        var cz = Math.cos(phi_z);
+        var sz = Math.sin(phi_z);
 
-        // rotate z (roll)
-        if (angles.z() != 0) {
-            Point2d p = new Point2d(rx, ry).rotate(angles.z());
-            rx = p.x;
-            ry = p.y;
-        }
+        var r00 = cz * cy;
+        var r01 = cz * sy * sx - sz * cx;
+        var r02 = cz * sy * cx + sz * sx;
+        var r10 = sz * cy;
+        var r11 = sz * sy * sx + cz * cx;
+        var r12 = sz * sy * cx - cz * sx;
+        var r20 = -sy;
+        var r21 = cy * sx;
+        var r22 = cy * cx;
 
-        return new Vector3f((float)rx, (float)ry, (float)rz);
+        var rotated_vx = r00 * vx + r01 * vy + r02 * vz;
+        var rotated_vy = r10 * vx + r11 * vy + r12 * vz;
+        var rotated_vz = r20 * vx + r21 * vy + r22 * vz;
+
+        return new Vector3f(
+                (float) rotated_vx,
+                (float) rotated_vy,
+                (float) rotated_vz
+        );
     }
 
     /// Projects this 3D vector onto a 2D plane defined by an origin point and two
@@ -153,47 +162,5 @@ public final class Vector3f extends VectorXf<Vector3f> {
     
     public Vector3d toDouble() {
         return new Vector3d(x(), y(), z());
-    }
-
-    /// Private helper class for rotation.
-    private static class Point2d {
-
-        private final double x;
-        private final double y;
-
-        private Point2d(double x, double y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        private Point2d rotate(double angle) {
-            // normalize angle
-            angle %= 360;
-
-            // special cases
-            if (angle == 0) {
-                return this;
-            }
-            if (angle == 90) {
-                return new Point2d(-y, x);
-            }
-            if (angle == 180) {
-                return new Point2d(-x, -y);
-            }
-            if (angle == 270) {
-                return new Point2d(y, -x);
-            }
-
-            // convert degrees to radians
-            angle = Math.toRadians(angle);
-
-            double r = Math.hypot(x, y);
-            double theta = Math.atan2(y, x);
-
-            double rx = r * Math.cos(theta + angle);
-            double ry = r * Math.sin(theta + angle);
-
-            return new Point2d(rx, ry);
-        }
     }
 }
